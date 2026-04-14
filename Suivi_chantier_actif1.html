@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<!-- saved from url=(0054)file:///C:/Users/emils/Downloads/ChantierPro_v3_1.html -->
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChantierPro v3 — Suivi de Chantier</title>
+<link href="./Suivi_chantier_actif1_files/css2" rel="stylesheet">
+<style>
+:root {
+  --ink: #1a1a1a;
+  --ink2: #4a4a4a;
+  --ink3: #8a8a8a;
+  --paper: #f8f6f1;
+  --paper2: #eeebe3;
+  --paper3: #e3dfd5;
+  --accent: #c85a2a;
+  --accent2: #e87a4a;
+  --green: #2a6b3a;
+  --green-bg: #e8f4ec;
+  --blue: #1e4a8a;
+  --blue-bg: #e8eef8;
+  --orange: #b85a00;
+  --orange-bg: #fdf0e0;
+  --red: #8a1a1a;
+  --red-bg: #faeaea;
+  --grey-bg: #f0ede6;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+  --radius: 8px;
+  --radius-lg: 14px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; }
+
+/* HEADER */
+.header {
+  background: var(--ink); padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px; position: sticky; top: 0; z-index: 100;
+}
+.logo { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: #fff; letter-spacing: 0.08em; display: flex; align-items: center; gap: 10px; }
+.logo-dot { width: 8px; height: 8px; background: var(--accent2); border-radius: 50%; }
+.header-right { display: flex; gap: 8px; align-items: center; }
+.header-btn {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  color: #ccc; font-size: 12px; font-family: 'DM Sans', sans-serif;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+}
+.header-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.header-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.header-btn.primary:hover { background: var(--accent2); }
+.save-indicator { font-size: 11px; color: #666; font-family: 'DM Mono', monospace; }
+
+/* LAYOUT */
+.layout { display: flex; min-height: calc(100vh - 56px); }
+
+.sidebar {
+  width: 270px; flex-shrink: 0;
+  background: var(--paper2); border-right: 1px solid var(--paper3);
+  padding: 1.5rem 1rem; display: flex; flex-direction: column; gap: 0.5rem;
+  overflow-y: auto;
+}
+.sidebar-title {
+  font-size: 10px; font-weight: 600; letter-spacing: 0.12em;
+  color: var(--ink3); text-transform: uppercase;
+  padding: 0 0.5rem; margin-bottom: 0.25rem; margin-top: 0.75rem;
+}
+.project-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius); cursor: pointer;
+  transition: all 0.15s; border: 1.5px solid transparent;
+}
+.project-item:hover { background: var(--paper3); }
+.project-item.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+.project-item.active .project-meta { color: #aaa; }
+.project-icon {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.pi-go { background: #fdebd0; }
+.pi-apt { background: #d5e8f8; }
+.project-item.active .pi-go, .project-item.active .pi-apt { opacity: 0.8; }
+.project-info { flex: 1; min-width: 0; }
+.project-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.project-meta { font-size: 11px; color: var(--ink3); margin-top: 1px; }
+.progress-mini { width: 36px; height: 4px; background: rgba(0,0,0,0.1); border-radius: 2px; overflow: hidden; flex-shrink: 0; }
+.progress-mini-fill { height: 100%; background: var(--accent2); border-radius: 2px; transition: width 0.3s; }
+.project-item.active .progress-mini { background: rgba(255,255,255,0.2); }
+.add-project-btn {
+  margin-top: 0.5rem; display: flex; align-items: center; gap: 8px;
+  padding: 10px 12px; border-radius: var(--radius);
+  border: 1.5px dashed var(--paper3); background: none; cursor: pointer;
+  color: var(--ink3); font-size: 12px; font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s; width: 100%;
+}
+.add-project-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--orange-bg); }
+.del-project-btn {
+  background: none; border: none; cursor: pointer; color: #888;
+  font-size: 14px; padding: 2px 4px; border-radius: 4px; transition: all 0.1s;
+  flex-shrink: 0; opacity: 0; line-height: 1;
+}
+.project-item:hover .del-project-btn { opacity: 1; }
+.project-item.active .del-project-btn { opacity: 1; color: #aaa; }
+.del-project-btn:hover { color: #ff5555 !important; background: rgba(255,85,85,0.15); }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; }
+
+/* DASHBOARD */
+.dashboard { padding: 2rem; max-width: 1100px; }
+.dash-header { margin-bottom: 2rem; }
+.dash-title { font-size: 26px; font-weight: 600; }
+.dash-sub { font-size: 14px; color: var(--ink3); margin-top: 4px; }
+
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+.kpi-card {
+  background: #fff; border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+  border: 1px solid var(--paper3); box-shadow: var(--shadow);
+}
+.kpi-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink3); margin-bottom: 8px; }
+.kpi-value { font-size: 32px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.kpi-value.green { color: var(--green); }
+.kpi-value.orange { color: var(--orange); }
+.kpi-value.red { color: var(--red); }
+.kpi-value.blue { color: var(--blue); }
+
+.projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; }
+.proj-card {
+  background: #fff; border-radius: var(--radius-lg); padding: 1.5rem;
+  border: 1px solid var(--paper3); box-shadow: var(--shadow);
+  cursor: pointer; transition: all 0.2s;
+}
+.proj-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: var(--accent2); }
+.proj-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+.proj-card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.proj-card-info { flex: 1; }
+.proj-card-name { font-size: 15px; font-weight: 600; }
+.proj-card-type { font-size: 11px; color: var(--ink3); margin-top: 2px; }
+.prog-bar { height: 6px; background: var(--paper3); border-radius: 3px; margin: 0.75rem 0 0.5rem; overflow: hidden; }
+.prog-bar-fill { height: 100%; border-radius: 3px; background: var(--accent2); transition: width 0.4s; }
+.prog-label { font-size: 12px; color: var(--ink3); display: flex; justify-content: space-between; }
+
+/* CHECKLIST VIEW */
+.checklist-view { padding: 2rem; max-width: 860px; }
+.checklist-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; gap: 1rem; }
+.checklist-title-group { flex: 1; }
+.checklist-title { font-size: 22px; font-weight: 600; }
+.checklist-sub { font-size: 13px; color: var(--ink3); margin-top: 4px; }
+.back-btn {
+  background: none; border: 1px solid var(--paper3); color: var(--ink2);
+  font-size: 12px; font-family: 'DM Sans', sans-serif;
+  padding: 6px 14px; border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.back-btn:hover { background: var(--paper2); }
+
+.progress-overview {
+  background: #fff; border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+  border: 1px solid var(--paper3); box-shadow: var(--shadow); margin-bottom: 1.5rem;
+}
+.progress-overview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.progress-overview-label { font-size: 13px; font-weight: 500; }
+.progress-overview-value { font-size: 13px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--accent); }
+.progress-bar-main { height: 8px; background: var(--paper3); border-radius: 4px; overflow: hidden; }
+.progress-bar-main-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 4px; transition: width 0.5s cubic-bezier(.4,0,.2,1); }
+
+.step-block {
+  background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--paper3);
+  box-shadow: var(--shadow); margin-bottom: 1rem; overflow: hidden;
+}
+.step-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 1rem 1.25rem; cursor: pointer;
+  transition: background 0.15s;
+}
+.step-header:hover { background: var(--grey-bg); }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; font-family: 'DM Mono', monospace;
+  flex-shrink: 0; background: var(--paper2); color: var(--ink2);
+}
+.step-num.done { background: var(--green); color: #fff; }
+.step-num.can { background: var(--blue); color: #fff; }
+.step-num.inprogress { background: var(--orange); color: #fff; }
+.step-name { flex: 1; font-size: 14px; font-weight: 500; }
+.step-remark { font-size: 11px; color: var(--ink3); font-style: italic; margin-top: 2px; }
+.step-badge {
+  font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0;
+}
+.badge-done { background: var(--green-bg); color: var(--green); }
+.badge-can { background: var(--blue-bg); color: var(--blue); }
+.badge-blocked { background: var(--red-bg); color: var(--red); }
+.badge-progress { background: var(--orange-bg); color: var(--orange); }
+
+.step-chevron { color: var(--ink3); font-size: 12px; flex-shrink: 0; transition: transform 0.2s; }
+.step-block.open .step-chevron { transform: rotate(180deg); }
+
+.prereqs {
+  border-top: 1px solid var(--paper3); padding: 0.75rem 1.25rem 1rem;
+  display: none; background: #fdfcf9;
+}
+.step-block.open .prereqs { display: block; }
+.prereq-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--paper3);
+}
+.prereq-item:last-child { border-bottom: none; }
+.prereq-check {
+  width: 18px; height: 18px; border-radius: 5px;
+  border: 1.5px solid var(--paper3); background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; margin-top: 1px; transition: all 0.15s;
+  font-size: 11px;
+}
+.prereq-check.checked { background: var(--green); border-color: var(--green); color: #fff; }
+.prereq-text { font-size: 13px; color: var(--ink2); line-height: 1.4; flex: 1; cursor: pointer; }
+.prereq-text.checked { color: var(--ink3); text-decoration: line-through; }
+.note-input {
+  width: 100%; margin-top: 10px; padding: 8px 10px;
+  border: 1px solid var(--paper3); border-radius: 6px;
+  font-size: 12px; font-family: 'DM Sans', sans-serif; color: var(--ink2);
+  background: #fff; resize: none; transition: border 0.15s;
+}
+.note-input:focus { outline: none; border-color: var(--accent2); }
+.note-label { font-size: 11px; color: var(--ink3); margin-top: 10px; margin-bottom: 4px; display: block; }
+
+/* MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #fff; border-radius: var(--radius-lg); padding: 2rem;
+  width: 420px; max-width: calc(100vw - 2rem);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+.modal h3 { font-size: 16px; font-weight: 600; margin-bottom: 1.25rem; }
+.modal label { font-size: 12px; font-weight: 600; color: var(--ink2); display: block; margin-bottom: 6px; }
+.modal input, .modal select {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--paper3);
+  border-radius: 8px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+  margin-bottom: 1rem; transition: border 0.15s; background: #fff;
+}
+.modal input:focus, .modal select:focus { outline: none; border-color: var(--accent2); }
+.modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-btns button {
+  padding: 8px 20px; border-radius: 8px; font-size: 13px;
+  font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all 0.15s;
+}
+.btn-cancel { background: var(--paper2); border: 1px solid var(--paper3); color: var(--ink2); }
+.btn-cancel:hover { background: var(--paper3); }
+.btn-confirm { background: var(--accent); border: 1px solid var(--accent); color: #fff; }
+.btn-confirm:hover { background: var(--accent2); }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--ink); color: #fff; padding: 10px 18px;
+  border-radius: 8px; font-size: 13px; z-index: 300;
+  transform: translateY(80px); opacity: 0; transition: all 0.3s;
+  pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.empty-state {
+  text-align: center; padding: 4rem 2rem; color: var(--ink3);
+}
+.empty-state .es-icon { font-size: 48px; margin-bottom: 1rem; }
+.empty-state h3 { font-size: 16px; font-weight: 500; color: var(--ink2); margin-bottom: 0.5rem; }
+.empty-state p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"><div class="logo-dot"></div>ChantierPro <span style="opacity:0.4;font-size:11px;margin-left:4px">v3</span></div>
+  <div class="header-right">
+    <span class="save-indicator" id="saveIndicator">Sauvegardé 15:27</span>
+    <button class="header-btn" onclick="exportData()">⬇ Exporter</button>
+    <button class="header-btn" onclick="document.getElementById(&#39;importFile&#39;).click()">⬆ Importer</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="header-btn primary" onclick="saveNow()">💾 Sauvegarder</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Vue globale</div>
+    <div class="project-item" id="navDashboard" onclick="showDashboard()">
+      <div class="project-icon" style="background:#e8e8e8">📊</div>
+      <div class="project-info">
+        <div class="project-name">Tableau de bord</div>
+        <div class="project-meta" id="dashMeta">2 chantiers · 1/37</div>
+      </div>
+    </div>
+
+    <div class="sidebar-title" style="margin-top:1.25rem">Mes chantiers</div>
+    <div id="projectList"><div class="project-item active" onclick="showProject(1776170932861)">
+      <div class="project-icon pi-apt">🏠</div>
+      <div class="project-info">
+        <div class="project-name">Appartement – Import Excel</div>
+        <div class="project-meta">Appartement · 1/20</div>
+      </div>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width:5%"></div></div>
+      <button class="del-project-btn" onclick="deleteProject(event,1776170932861)" title="Supprimer">×</button>
+    </div><div class="project-item " onclick="showProject(1776170932890)">
+      <div class="project-icon pi-go">🏗</div>
+      <div class="project-info">
+        <div class="project-name">Gros œuvre – Import Excel</div>
+        <div class="project-meta">Gros œuvre · 0/17</div>
+      </div>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width:0%"></div></div>
+      <button class="del-project-btn" onclick="deleteProject(event,1776170932890)" title="Supprimer">×</button>
+    </div></div>
+
+    <button class="add-project-btn" onclick="openAddModal()">＋ Nouveau chantier</button>
+  </aside>
+
+  <main class="main" id="mainContent"><div class="checklist-view">
+    <div class="checklist-header">
+      <div class="checklist-title-group">
+        <div style="font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">🏠 Appartement</div>
+        <div class="checklist-title">Appartement – Import Excel</div>
+      </div>
+      <button class="back-btn" onclick="showDashboard()">← Tableau de bord</button>
+    </div>
+    <div class="progress-overview">
+      <div class="progress-overview-header">
+        <span class="progress-overview-label">Avancement global</span>
+        <span class="progress-overview-value">1 / 20 étapes terminées (5%)</span>
+      </div>
+      <div class="progress-bar-main"><div class="progress-bar-main-fill" style="width:5%"></div></div>
+    </div>
+    <div class="step-block " id="stepBlock_1776170932861_0">
+      <div class="step-header" onclick="toggleStep(1776170932861,0)">
+        <div class="step-num done">1</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Maçonnerie</div>
+          <div class="step-remark">Point de départ</div>
+        </div>
+        <div class="step-badge badge-done">✓ Terminé</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check checked" onclick="togglePrereq(1776170932861,0,0)">
+          ✓
+        </div>
+        <div class="prereq-text checked" onclick="togglePrereq(1776170932861,0,0)">
+          Plan de callage signé par le client
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check checked" onclick="togglePrereq(1776170932861,0,1)">
+          ✓
+        </div>
+        <div class="prereq-text checked" onclick="togglePrereq(1776170932861,0,1)">
+          Toutes les cloisons montées
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check checked" onclick="togglePrereq(1776170932861,0,2)">
+          ✓
+        </div>
+        <div class="prereq-text checked" onclick="togglePrereq(1776170932861,0,2)">
+          Plan de réservations techniques spéciales transmis
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check checked" onclick="togglePrereq(1776170932861,0,3)">
+          ✓
+        </div>
+        <div class="prereq-text checked" onclick="togglePrereq(1776170932861,0,3)">
+          Chantier propre et sécurisé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check checked" onclick="togglePrereq(1776170932861,0,4)">
+          ✓
+        </div>
+        <div class="prereq-text checked" onclick="togglePrereq(1776170932861,0,4)">
+          Validation fiche technique par le bureau de contrôle (ex : mousse de remplissage)
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,0,this.value)"></textarea>
+        <button style="margin-top:8px;padding:6px 16px;border-radius:6px;font-size:12px;font-family:&#39;DM Sans&#39;,sans-serif;cursor:pointer;background:var(--paper3);color:var(--ink2);border:none;float:right" onclick="markUndone(1776170932861,0)">↩ Rouvrir</button>
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block open" id="stepBlock_1776170932861_1">
+      <div class="step-header" onclick="toggleStep(1776170932861,1)">
+        <div class="step-num ">2</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Incorporations sanitaires</div>
+          <div class="step-remark">Évacuations + alimentations avant plâtre</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,1,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,1,0)">
+          Plans sanitaires signés par le client
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,1,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,1,1)">
+          Plan de cuisine validé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,1,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,1,2)">
+          Choix robinet extérieur et alimentation machine à laver
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,1,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,1,3)">
+          Plan de callage signé : collecteur chauffage sol, chauffage ECS, position WMC et bouches de ventilation
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,1,this.value)">choix client</textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_2">
+      <div class="step-header" onclick="toggleStep(1776170932861,2)">
+        <div class="step-num ">3</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Incorporations électriques</div>
+          <div class="step-remark">Gaines + boîtes avant plâtre</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,2,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,2,0)">
+          Plans électriques (CCTP) signés par le client
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,2,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,2,1)">
+          Plan de cuisine validé par le client
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,2,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,2,2)">
+          Positionnement sortie câble store confirmé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,2,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,2,3)">
+          Plan de callage signé avec tableau divisionnaire
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,2,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_3">
+      <div class="step-header" onclick="toggleStep(1776170932861,3)">
+        <div class="step-num ">4</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Plâtre / enduit projeté</div>
+          <div class="step-remark">Séchage : 2 à 4 semaines</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,0)">
+          Incorporations sanitaires terminées
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,1)">
+          Incorporations électriques terminées
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,2)">
+          Est-ce qu'il y a des plinthes encastrées ?
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,3)">
+          Est-ce qu'il y a des cadres portes encastrés ?
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,4)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,4)">
+          Est-ce que les fenêtres sont posées ?
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,5)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,5)">
+          Est-ce que les tableaux encastrés ont bien été posés d'aplomb ?
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,3,6)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,3,6)">
+          Est-ce que le plan du plafonnage a été transmis ?
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,3,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_4">
+      <div class="step-header" onclick="toggleStep(1776170932861,4)">
+        <div class="step-num ">5</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Préchappe</div>
+          <div class="step-remark">Poser sur toute la surface avant chape</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,4,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,4,0)">
+          Plâtre terminé et suffisamment sec (min. 2 semaines)
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,4,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,4,1)">
+          Est-ce que les techniques sont terminées ?
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,4,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,4,2)">
+          Sol propre, dépoussiéré et plan
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,4,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,4,3)">
+          Est-ce que le plan des préchappes a été transmis ?
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,4,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_5">
+      <div class="step-header" onclick="toggleStep(1776170932861,5)">
+        <div class="step-num ">6</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Chauffage au sol – pose</div>
+          <div class="step-remark">Tubes PER sur natte isolante</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,5,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,5,0)">
+          Natte acoustique posée sur toute la surface
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,5,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,5,1)">
+          Plan de zonage chauffage validé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,5,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,5,2)">
+          Collecteurs commandés et livrés
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,5,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_6">
+      <div class="step-header" onclick="toggleStep(1776170932861,6)">
+        <div class="step-num ">7</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Chape</div>
+          <div class="step-remark">Vérifier manomètre le matin du coulage</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,6,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,6,0)">
+          Réseaux sous pression
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,6,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,6,1)">
+          Joints de dilatation posés
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,6,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,6,2)">
+          Température chantier &gt; 5 °C
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,6,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,6,3)">
+          Temps de séchage de la préchappe respecté
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,6,4)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,6,4)">
+          Plan des chapes transmis
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,6,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_7">
+      <div class="step-header" onclick="toggleStep(1776170932861,7)">
+        <div class="step-num ">8</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Revêtement de sol et faïence murale (carrelage / parquet)</div>
+          <div class="step-remark">Ne jamais poser à l'œil — mesure obligatoire</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,7,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,7,0)">
+          Offre client signée
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,7,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,7,1)">
+          Carrelage / parquet livré sur chantier
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,7,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,7,2)">
+          Protocole de chauffe terminé
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,7,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_8">
+      <div class="step-header" onclick="toggleStep(1776170932861,8)">
+        <div class="step-num ">9</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Peinture plafond salle de bain</div>
+          <div class="step-remark">Avant pose des portes palières</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,8,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,8,0)">
+          Revêtement de sol terminé et protégé (film de protection)
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,8,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,8,1)">
+          Offre client signée
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,8,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_9">
+      <div class="step-header" onclick="toggleStep(1776170932861,9)">
+        <div class="step-num ">10</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Menuiseries palières (portes palières)</div>
+          <div class="step-remark">Poser avant lissage murs</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,9,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,9,0)">
+          Peinture plafond 1ère couche terminée
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,9,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,9,1)">
+          Cotes des baies vérifiées sur place
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,9,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_10">
+      <div class="step-header" onclick="toggleStep(1776170932861,10)">
+        <div class="step-num ">11</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Pose sanitaire</div>
+          <div class="step-remark">Zones humides : SdB, WC, cuisine</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,10,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,10,0)">
+          Faïence / carrelage mural commandé et livré
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,10,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,10,1)">
+          Porte palière posée et sécurisée
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,10,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,10,2)">
+          Plafond de la salle de bain peint
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,10,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_11">
+      <div class="step-header" onclick="toggleStep(1776170932861,11)">
+        <div class="step-num ">12</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">1ère couche peinture murs</div>
+          
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,11,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,11,0)">
+          Support sec
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,11,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,11,1)">
+          Température suffisante
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,11,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_12">
+      <div class="step-header" onclick="toggleStep(1776170932861,12)">
+        <div class="step-num ">13</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Menuiserie intérieure – huisseries / bâtis</div>
+          <div class="step-remark">Cadres avant 2ème couche peinture</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,12,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,12,0)">
+          1ère couche peinture murs terminée
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,12,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,12,1)">
+          Cotes des passages de portes vérifiées sur place
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,12,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_13">
+      <div class="step-header" onclick="toggleStep(1776170932861,13)">
+        <div class="step-num ">14</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Plinthes</div>
+          <div class="step-remark">Après sol et huisseries posés</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,13,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,13,0)">
+          Portes posées
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,13,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_14">
+      <div class="step-header" onclick="toggleStep(1776170932861,14)">
+        <div class="step-num ">15</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">2ème couche peinture + Acryl</div>
+          
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,14,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,14,0)">
+          Plinthes posées
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,14,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,14,1)">
+          1ère couche peinture sèche
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,14,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_15">
+      <div class="step-header" onclick="toggleStep(1776170932861,15)">
+        <div class="step-num ">16</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Silicone</div>
+          <div class="step-remark">Dernière opération avant appareillage</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,15,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,15,0)">
+          2ème couche peinture terminée et sèche
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,15,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,15,1)">
+          Couleurs des joints validées
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,15,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_16">
+      <div class="step-header" onclick="toggleStep(1776170932861,16)">
+        <div class="step-num ">17</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Appareillage sanitaire – finitions</div>
+          <div class="step-remark">WC, lavabos, douches, robinetterie</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,16,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,16,0)">
+          Client a validé les positions
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,16,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_17">
+      <div class="step-header" onclick="toggleStep(1776170932861,17)">
+        <div class="step-num ">18</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Appareillage électrique – finitions</div>
+          <div class="step-remark">Prises, interrupteurs, luminaires, tableau</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,17,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,17,0)">
+          Appareillage sanitaire terminé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,17,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,17,1)">
+          Tous équipements électriques commandés et livrés
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,17,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,17,2)">
+          Demande de raccordement ENEDIS / CONSUEL envoyée
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,17,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_18">
+      <div class="step-header" onclick="toggleStep(1776170932861,18)">
+        <div class="step-num ">19</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Nettoyage</div>
+          
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,18,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,18,0)">
+          Appareillage électrique terminé
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,18,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,18,1)">
+          Tous les corps de métier ont quitté le chantier
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,18,2)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,18,2)">
+          Entreprise de nettoyage confirmée
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,18,3)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,18,3)">
+          Benne pour déchets résiduels prévue
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,18,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div><div class="step-block " id="stepBlock_1776170932861_19">
+      <div class="step-header" onclick="toggleStep(1776170932861,19)">
+        <div class="step-num ">20</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">Remise des clés</div>
+          <div class="step-remark">⚠️ PV signé obligatoire</div>
+        </div>
+        <div class="step-badge badge-blocked">Ne peut pas démarrer</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        <div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,19,0)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,19,0)">
+          Nettoyage fait
+        </div>
+      </div><div class="prereq-item">
+        <div class="prereq-check " onclick="togglePrereq(1776170932861,19,1)">
+          
+        </div>
+        <div class="prereq-text " onclick="togglePrereq(1776170932861,19,1)">
+          Préréception effectuée
+        </div>
+      </div>
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..." oninput="updateNote(1776170932861,19,this.value)"></textarea>
+        
+        <div style="clear:both"></div>
+      </div>
+    </div>
+  </div></main>
+</div>
+
+<!-- Add project modal -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <h3>Nouveau chantier</h3>
+    <label>Nom du chantier</label>
+    <input type="text" id="newProjectName" placeholder="ex. Appartement A12 – Belleg">
+    <label>Type de suivi</label>
+    <select id="newProjectType">
+      <option value="apt">🏠 Appartement (second œuvre + finitions) — 20 étapes</option>
+      <option value="go">🏗 Gros œuvre (terrassement → réception GO) — 17 étapes</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeAddModal()">Annuler</button>
+      <button class="btn-confirm" onclick="addProject()">Créer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">💾 Sauvegardé</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  DATA TEMPLATES (from Excel files)
+// ─────────────────────────────────────────────
+
+const TEMPLATES = {
+
+  apt: {
+    label: 'Appartement',
+    icon: '🏠',
+    iconClass: 'pi-apt',
+    steps: [
+      { id:1, name:'Maçonnerie', remark:'Point de départ', prereqs:[
+        'Plan de callage signé par le client',
+        'Toutes les cloisons montées',
+        'Plan de réservations techniques spéciales transmis',
+        'Chantier propre et sécurisé',
+        'Validation fiche technique par le bureau de contrôle (ex : mousse de remplissage)'
+      ]},
+      { id:2, name:'Incorporations sanitaires', remark:'Évacuations + alimentations avant plâtre', prereqs:[
+        'Plans sanitaires signés par le client',
+        'Plan de cuisine validé',
+        'Choix robinet extérieur et alimentation machine à laver',
+        'Plan de callage signé : collecteur chauffage sol, chauffage ECS, position WMC et bouches de ventilation'
+      ]},
+      { id:3, name:'Incorporations électriques', remark:'Gaines + boîtes avant plâtre', prereqs:[
+        'Plans électriques (CCTP) signés par le client',
+        'Plan de cuisine validé par le client',
+        'Positionnement sortie câble store confirmé',
+        'Plan de callage signé avec tableau divisionnaire'
+      ]},
+      { id:4, name:'Plâtre / enduit projeté', remark:'Séchage : 2 à 4 semaines', prereqs:[
+        'Incorporations sanitaires terminées',
+        'Incorporations électriques terminées',
+        'Est-ce qu\'il y a des plinthes encastrées ?',
+        'Est-ce qu\'il y a des cadres portes encastrés ?',
+        'Est-ce que les fenêtres sont posées ?',
+        'Est-ce que les tableaux encastrés ont bien été posés d\'aplomb ?',
+        'Est-ce que le plan du plafonnage a été transmis ?'
+      ]},
+      { id:5, name:'Préchappe', remark:'Poser sur toute la surface avant chape', prereqs:[
+        'Plâtre terminé et suffisamment sec (min. 2 semaines)',
+        'Est-ce que les techniques sont terminées ?',
+        'Sol propre, dépoussiéré et plan',
+        'Est-ce que le plan des préchappes a été transmis ?'
+      ]},
+      { id:6, name:'Chauffage au sol – pose', remark:'Tubes PER sur natte isolante', prereqs:[
+        'Natte acoustique posée sur toute la surface',
+        'Plan de zonage chauffage validé',
+        'Collecteurs commandés et livrés'
+      ]},
+      { id:7, name:'Chape', remark:'Vérifier manomètre le matin du coulage', prereqs:[
+        'Réseaux sous pression',
+        'Joints de dilatation posés',
+        'Température chantier > 5 °C',
+        'Temps de séchage de la préchappe respecté',
+        'Plan des chapes transmis'
+      ]},
+      { id:8, name:'Revêtement de sol et faïence murale (carrelage / parquet)', remark:"Ne jamais poser à l'œil — mesure obligatoire", prereqs:[
+        'Offre client signée',
+        'Carrelage / parquet livré sur chantier',
+        'Protocole de chauffe terminé'
+      ]},
+      { id:9, name:'Peinture plafond salle de bain', remark:'Avant pose des portes palières', prereqs:[
+        'Revêtement de sol terminé et protégé (film de protection)',
+        'Offre client signée'
+      ]},
+      { id:10, name:'Menuiseries palières (portes palières)', remark:'Poser avant lissage murs', prereqs:[
+        'Peinture plafond 1ère couche terminée',
+        'Cotes des baies vérifiées sur place'
+      ]},
+      { id:11, name:'Pose sanitaire', remark:'Zones humides : SdB, WC, cuisine', prereqs:[
+        'Faïence / carrelage mural commandé et livré',
+        'Porte palière posée et sécurisée',
+        'Plafond de la salle de bain peint'
+      ]},
+      { id:12, name:'1ère couche peinture murs', remark:'', prereqs:[
+        'Support sec',
+        'Température suffisante'
+      ]},
+      { id:13, name:'Menuiserie intérieure – huisseries / bâtis', remark:'Cadres avant 2ème couche peinture', prereqs:[
+        '1ère couche peinture murs terminée',
+        'Cotes des passages de portes vérifiées sur place'
+      ]},
+      { id:14, name:'Plinthes', remark:'Après sol et huisseries posés', prereqs:[
+        'Portes posées'
+      ]},
+      { id:15, name:'2ème couche peinture + Acryl', remark:'', prereqs:[
+        'Plinthes posées',
+        '1ère couche peinture sèche'
+      ]},
+      { id:16, name:'Silicone', remark:'Dernière opération avant appareillage', prereqs:[
+        '2ème couche peinture terminée et sèche',
+        'Couleurs des joints validées'
+      ]},
+      { id:17, name:'Appareillage sanitaire – finitions', remark:'WC, lavabos, douches, robinetterie', prereqs:[
+        'Client a validé les positions'
+      ]},
+      { id:18, name:'Appareillage électrique – finitions', remark:'Prises, interrupteurs, luminaires, tableau', prereqs:[
+        'Appareillage sanitaire terminé',
+        'Tous équipements électriques commandés et livrés',
+        'Demande de raccordement ENEDIS / CONSUEL envoyée'
+      ]},
+      { id:19, name:'Nettoyage', remark:'', prereqs:[
+        'Appareillage électrique terminé',
+        'Tous les corps de métier ont quitté le chantier',
+        'Entreprise de nettoyage confirmée',
+        'Benne pour déchets résiduels prévue'
+      ]},
+      { id:20, name:'Remise des clés', remark:'⚠️ PV signé obligatoire', prereqs:[
+        'Nettoyage fait',
+        'Préréception effectuée'
+      ]}
+    ]
+  },
+
+  go: {
+    label: 'Gros œuvre',
+    icon: '🏗',
+    iconClass: 'pi-go',
+    steps: [
+      { id:1, name:'Installation chantier', remark:'Base vie, clôtures, signalisation', prereqs:[
+        'Permis de construire affiché et valide',
+        "Plan de masse validé par l'architecte",
+        'Réseaux existants localisés (eau, gaz, élec)',
+        'Bornage effectué',
+        'Grue — emplacement défini'
+      ]},
+      { id:2, name:'Terrassement – déblais', remark:'Fouilles générales selon plan de nivellement', prereqs:[
+        'Installation chantier terminée',
+        'Cotes de fond de fouille définies sur plan',
+        'Entreprise de terrassement confirmée',
+        'Photos terrain avant travaux prises'
+      ]},
+      { id:3, name:'Béton de propreté', remark:'Fond de fouille propre et compacté', prereqs:[
+        'Terrassement terminé',
+        'Fond de fouille propre et compacté',
+        'Bureau de contrôle — feu vert donné'
+      ]},
+      { id:4, name:'Réseaux enterrés EU / EP', remark:'Canalisations eaux usées + eaux pluviales', prereqs:[
+        'Fond de fouille atteint et validé',
+        "Plans réseaux EU/EP signés par l'architecte",
+        'Photos canalisations et prise de terre prises'
+      ]},
+      { id:5, name:'Mise à la terre + Fondations', remark:'Armatures + coulage béton fondations', prereqs:[
+        'Béton de propreté durci (min. 24h)',
+        'Plans de ferraillage validés',
+        'Bureau de contrôle présent pour réception armatures'
+      ]},
+      { id:6, name:'Radier / dalle basse', remark:"Dalle béton armé sur toute l'emprise", prereqs:[
+        'Fondations terminées et réceptionnées',
+        'Étanchéité sous radier posée',
+        'Bureau de contrôle a validé les armatures'
+      ]},
+      { id:7, name:'Élévation sous-sol', remark:'Murs et voiles béton SS', prereqs:[
+        'Radier décoffré — résistance béton ok',
+        'Plans coffrage SS validés'
+      ]},
+      { id:8, name:'Étanchéité + remblaiement', remark:'Protection murs enterrés + terres compactées', prereqs:[
+        'Murs sous-sol décoffrés',
+        'Derbigum murs enterrés posé',
+        'Étanchéité réceptionnée par bureau de contrôle',
+        'Photos étanchéité prises',
+        'Drainage périphérique posé'
+      ]},
+      { id:9, name:'Dalle sur sous-sol', remark:'Plancher haut SS — coffrage + coulage', prereqs:[
+        'Murs SS terminés et validés',
+        'Remblaiement terminé',
+        'Plans de dalle validés'
+      ]},
+      { id:10, name:'Élévation RDC', remark:'Murs et voiles béton RDC', prereqs:[
+        'Dalle sur SS terminée et décoffrée',
+        'Résistance béton dalle vérifiée (min. 7 jours)'
+      ]},
+      { id:11, name:'Dalle sur RDC', remark:'Plancher haut RDC — coffrage + coulage', prereqs:[
+        'Murs RDC terminés et validés',
+        'Bureau de contrôle a validé les armatures'
+      ]},
+      { id:12, name:'Élévation étages courants (R+1, R+2…)', remark:'Répéter cycle murs + dalle par niveau', prereqs:[
+        'Dalle niveau inférieur terminée et décoffrée',
+        'Résistance béton vérifiée avant charge suivante'
+      ]},
+      { id:13, name:'Charpente / structure toiture', remark:"Ossature toiture — bois ou béton", prereqs:[
+        'Dernier niveau béton terminé',
+        "Plans charpente validés par bureau d'études"
+      ]},
+      { id:14, name:'Couverture + étanchéité toiture', remark:"Étanchéité toiture — bâtiment clos hors eau", prereqs:[
+        'Charpente terminée et réceptionnée',
+        'Bandes terrasse posées',
+        'Remontées derbigum réalisées (seuils, purénit)'
+      ]},
+      { id:15, name:'Menuiseries extérieures', remark:"Fenêtres + portes — mise hors d'air", prereqs:[
+        'Toiture terminée',
+        'Cotes des baies relevées et confirmées sur site'
+      ]},
+      { id:16, name:'Étanchéité balcons + façade + garde-corps', remark:'Derbigum balcons, ravalement, garde-corps', prereqs:[
+        'Menuiseries extérieures posées',
+        'Garde-corps terrasse et toiture posés',
+        'Façade terminée'
+      ]},
+      { id:17, name:'Réception gros œuvre', remark:'⚠️ PV signé — avant tout second œuvre', prereqs:[
+        'Façade et étanchéité balcons terminées',
+        'Bureau de contrôle — visite réception effectuée',
+        'PV de réception GO signé',
+        'Réserves notées par écrit',
+        'Nettoyage du chantier après GO'
+      ]}
+    ]
+  }
+};
+
+// ─────────────────────────────────────────────
+//  STATE
+// ─────────────────────────────────────────────
+
+const STORAGE_KEY = 'chantierProV3';
+let state = { projects: [], currentView: 'dashboard', currentProjectId: null };
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) state = JSON.parse(raw);
+  } catch(e) {}
+  if (!state.projects) state.projects = [];
+  updateSaveIndicator();
+}
+
+function saveNow() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateSaveIndicator();
+  showToast('💾 Sauvegardé');
+}
+
+function updateSaveIndicator() {
+  const el = document.getElementById('saveIndicator');
+  const now = new Date();
+  el.textContent = `Sauvegardé ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `ChantierPro_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  showToast('⬇ Données exportées');
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = JSON.parse(ev.target.result);
+      state = data;
+      saveNow();
+      render();
+      showToast('⬆ Données importées');
+    } catch(err) {
+      showToast('❌ Fichier invalide');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ─────────────────────────────────────────────
+//  PROJECT HELPERS
+// ─────────────────────────────────────────────
+
+function createProject(name, type) {
+  const tmpl = TEMPLATES[type];
+  const steps = tmpl.steps.map(s => ({
+    id: s.id,
+    checked: new Array(s.prereqs.length).fill(false),
+    note: '',
+    open: false,
+    done: false,
+      inprogress: false
+  }));
+  return {
+    id: Date.now(),
+    name,
+    type,
+    steps,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function getProject(id) { return state.projects.find(p => p.id === id); }
+
+function getProgress(project) {
+  const done = project.steps.filter(s => s.done).length;
+  return { done, total: project.steps.length, pct: Math.round(done / project.steps.length * 100) };
+}
+
+function getStepStatus(project, stepIdx) {
+  const s = project.steps[stepIdx];
+  if (s.done) return 'done';
+  if (s.inprogress) return 'inprogress';
+  const total = s.checked.length;
+  const ok = s.checked.filter(Boolean).length;
+  if (total === 0) return 'can';
+  if (ok < total) return 'blocked';
+  return 'can';
+}
+
+function getStatusLabel(status) {
+  return { done:'✓ Terminé', can:'Peut démarrer', blocked:'Ne peut pas démarrer', inprogress:'En cours' }[status];
+}
+function getStatusBadgeClass(status) {
+  return { done:'badge-done', can:'badge-can', blocked:'badge-blocked', inprogress:'badge-progress' }[status];
+}
+
+// ─────────────────────────────────────────────
+//  RENDER
+// ─────────────────────────────────────────────
+
+function render() {
+  renderSidebar();
+  if (state.currentView === 'dashboard') renderDashboard();
+  else renderChecklist(state.currentProjectId);
+}
+
+function renderSidebar() {
+  const list = document.getElementById('projectList');
+  const dashNav = document.getElementById('navDashboard');
+  dashNav.classList.toggle('active', state.currentView === 'dashboard');
+
+  // Total stats for dashboard meta
+  const totalDone = state.projects.reduce((a,p) => a + p.steps.filter(s=>s.done).length, 0);
+  const totalSteps = state.projects.reduce((a,p) => a + p.steps.length, 0);
+  document.getElementById('dashMeta').textContent =
+    state.projects.length === 0 ? 'Aucun chantier' :
+    `${state.projects.length} chantier${state.projects.length>1?'s':''} · ${totalDone}/${totalSteps}`;
+
+  list.innerHTML = state.projects.map(p => {
+    const prog = getProgress(p);
+    const tmpl = TEMPLATES[p.type];
+    const active = state.currentView === 'project' && state.currentProjectId === p.id;
+    return `<div class="project-item ${active?'active':''}" onclick="showProject(${p.id})">
+      <div class="project-icon ${tmpl.iconClass}">${tmpl.icon}</div>
+      <div class="project-info">
+        <div class="project-name">${escHtml(p.name)}</div>
+        <div class="project-meta">${tmpl.label} · ${prog.done}/${prog.total}</div>
+      </div>
+      <div class="progress-mini"><div class="progress-mini-fill" style="width:${prog.pct}%"></div></div>
+      <button class="del-project-btn" onclick="deleteProject(event,${p.id})" title="Supprimer">×</button>
+    </div>`;
+  }).join('');
+}
+
+function renderDashboard() {
+  const main = document.getElementById('mainContent');
+  const totalProjects = state.projects.length;
+  const totalDone = state.projects.reduce((a,p) => a + p.steps.filter(s=>s.done).length, 0);
+  const totalSteps = state.projects.reduce((a,p) => a + p.steps.length, 0);
+  const canStart = state.projects.reduce((a,p) => {
+    return a + p.steps.filter((s,i) => getStepStatus(p,i) === 'can').length;
+  }, 0);
+  const inProgress = state.projects.reduce((a,p) => {
+    return a + p.steps.filter((s,i) => getStepStatus(p,i) === 'inprogress').length;
+  }, 0);
+  const blocked = state.projects.reduce((a,p) => {
+    return a + p.steps.filter((s,i) => getStepStatus(p,i) === 'blocked').length;
+  }, 0);
+
+  main.innerHTML = `<div class="dashboard">
+    <div class="dash-header">
+      <div class="dash-title">Tableau de bord</div>
+      <div class="dash-sub">Vue globale de tous vos chantiers</div>
+    </div>
+    <div class="kpi-row" style="grid-template-columns: repeat(5,1fr)">
+      <div class="kpi-card"><div class="kpi-label">Chantiers</div><div class="kpi-value blue">${totalProjects}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Étapes terminées</div><div class="kpi-value green">${totalDone}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Peuvent démarrer</div><div class="kpi-value" style="color:var(--blue)">${canStart}</div></div>
+      <div class="kpi-card"><div class="kpi-label">En cours</div><div class="kpi-value orange">${inProgress}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Bloquées</div><div class="kpi-value red">${blocked}</div></div>
+    </div>
+    ${totalProjects === 0 ? `<div class="empty-state">
+      <div class="es-icon">🏗</div>
+      <h3>Aucun chantier pour l'instant</h3>
+      <p>Cliquez sur « + Nouveau chantier » pour commencer</p>
+    </div>` : `<div class="projects-grid">${state.projects.map(p => {
+      const prog = getProgress(p);
+      const tmpl = TEMPLATES[p.type];
+      return `<div class="proj-card" onclick="showProject(${p.id})">
+        <div class="proj-card-header">
+          <div class="proj-card-icon ${tmpl.iconClass}">${tmpl.icon}</div>
+          <div class="proj-card-info">
+            <div class="proj-card-name">${escHtml(p.name)}</div>
+            <div class="proj-card-type">${tmpl.label} — ${tmpl.steps.length} étapes</div>
+          </div>
+        </div>
+        <div class="prog-bar"><div class="prog-bar-fill" style="width:${prog.pct}%"></div></div>
+        <div class="prog-label"><span>${prog.done} / ${prog.total} étapes</span><span>${prog.pct}%</span></div>
+      </div>`;
+    }).join('')}</div>`}
+  </div>`;
+}
+
+function renderChecklist(pid) {
+  const project = getProject(pid);
+  if (!project) { showDashboard(); return; }
+  const tmpl = TEMPLATES[project.type];
+  const prog = getProgress(project);
+  const main = document.getElementById('mainContent');
+
+  const stepsHtml = tmpl.steps.map((tmplStep, idx) => {
+    const ps = project.steps[idx];
+    const status = getStepStatus(project, idx);
+    const numClass = status === 'done' ? 'done' : status === 'can' ? 'can' : status === 'inprogress' ? 'inprogress' : '';
+    const isOpen = ps.open;
+
+    const prereqsHtml = tmplStep.prereqs.map((pText, pi) => {
+      const ck = ps.checked[pi];
+      return `<div class="prereq-item">
+        <div class="prereq-check ${ck?'checked':''}" onclick="togglePrereq(${pid},${idx},${pi})">
+          ${ck ? '✓' : ''}
+        </div>
+        <div class="prereq-text ${ck?'checked':''}" onclick="togglePrereq(${pid},${idx},${pi})">
+          ${escHtml(pText)}
+        </div>
+      </div>`;
+    }).join('');
+
+    const noteVal = escHtml(ps.note || '');
+
+    return `<div class="step-block ${isOpen?'open':''}" id="stepBlock_${pid}_${idx}">
+      <div class="step-header" onclick="toggleStep(${pid},${idx})">
+        <div class="step-num ${numClass}">${tmplStep.id}</div>
+        <div class="step-info" style="flex:1;min-width:0">
+          <div class="step-name">${escHtml(tmplStep.name)}</div>
+          ${tmplStep.remark ? `<div class="step-remark">${escHtml(tmplStep.remark)}</div>` : ''}
+        </div>
+        <div class="step-badge ${getStatusBadgeClass(status)}">${getStatusLabel(status)}</div>
+        <div class="step-chevron">▼</div>
+      </div>
+      <div class="prereqs">
+        ${prereqsHtml}
+        <span class="note-label">Remarque / note de visite</span>
+        <textarea class="note-input" rows="2" placeholder="Ajouter une note..."
+          oninput="updateNote(${pid},${idx},this.value)">${noteVal}</textarea>
+        ${status === 'done'
+          ? `<button style="margin-top:8px;padding:6px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--paper3);color:var(--ink2);border:none;float:right" onclick="markUndone(${pid},${idx})">↩ Rouvrir</button>`
+          : status === 'inprogress'
+          ? `<button style="margin-top:8px;padding:6px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--green);color:#fff;border:none;float:right;margin-left:8px" onclick="markDone(${pid},${idx})">✓ Marquer terminé</button>
+             <button style="margin-top:8px;padding:6px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--paper3);color:var(--ink2);border:none;float:right" onclick="markUndone(${pid},${idx})">↩ Rouvrir</button>`
+          : status === 'can'
+          ? `<button style="margin-top:8px;padding:6px 16px;border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;background:var(--blue);color:#fff;border:none;float:right" onclick="markInProgress(${pid},${idx})">▶ Démarrer</button>`
+          : ``}
+        <div style="clear:both"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  main.innerHTML = `<div class="checklist-view">
+    <div class="checklist-header">
+      <div class="checklist-title-group">
+        <div style="font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:4px">${tmpl.icon} ${tmpl.label}</div>
+        <div class="checklist-title">${escHtml(project.name)}</div>
+      </div>
+      <button class="back-btn" onclick="showDashboard()">← Tableau de bord</button>
+    </div>
+    <div class="progress-overview">
+      <div class="progress-overview-header">
+        <span class="progress-overview-label">Avancement global</span>
+        <span class="progress-overview-value">${prog.done} / ${prog.total} étapes terminées (${prog.pct}%)</span>
+      </div>
+      <div class="progress-bar-main"><div class="progress-bar-main-fill" style="width:${prog.pct}%"></div></div>
+    </div>
+    ${stepsHtml}
+  </div>`;
+}
+
+// ─────────────────────────────────────────────
+//  ACTIONS
+// ─────────────────────────────────────────────
+
+function showDashboard() {
+  state.currentView = 'dashboard';
+  state.currentProjectId = null;
+  render();
+}
+
+function showProject(id) {
+  state.currentView = 'project';
+  state.currentProjectId = id;
+  render();
+}
+
+function toggleStep(pid, idx) {
+  const p = getProject(pid);
+  p.steps[idx].open = !p.steps[idx].open;
+  renderChecklist(pid);
+}
+
+function togglePrereq(pid, stepIdx, prereqIdx) {
+  const p = getProject(pid);
+  p.steps[stepIdx].checked[prereqIdx] = !p.steps[stepIdx].checked[prereqIdx];
+  autoSaveAndRender();
+}
+
+function updateNote(pid, stepIdx, val) {
+  const p = getProject(pid);
+  p.steps[stepIdx].note = val;
+  // Don't re-render (would lose cursor), just save
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function markInProgress(pid, stepIdx) {
+  const p = getProject(pid);
+  p.steps[stepIdx].inprogress = true;
+  p.steps[stepIdx].done = false;
+  p.steps[stepIdx].open = true;
+  autoSaveAndRender();
+  showToast('▶ Étape démarrée');
+}
+
+function markDone(pid, stepIdx) {
+  const p = getProject(pid);
+  p.steps[stepIdx].done = true;
+  p.steps[stepIdx].inprogress = false;
+  p.steps[stepIdx].checked = p.steps[stepIdx].checked.map(() => true);
+  p.steps[stepIdx].open = false;
+  autoSaveAndRender();
+  showToast('✓ Étape marquée terminée');
+}
+
+function markUndone(pid, stepIdx) {
+  const p = getProject(pid);
+  p.steps[stepIdx].done = false;
+  p.steps[stepIdx].inprogress = false;
+  p.steps[stepIdx].checked = p.steps[stepIdx].checked.map(() => false);
+  p.steps[stepIdx].open = true;
+  autoSaveAndRender();
+  showToast('↩ Étape réouverte');
+}
+
+function autoSaveAndRender() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  updateSaveIndicator();
+  render();
+}
+
+function openAddModal() {
+  document.getElementById('newProjectName').value = '';
+  document.getElementById('addModal').classList.add('open');
+  setTimeout(() => document.getElementById('newProjectName').focus(), 100);
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+function addProject() {
+  const name = document.getElementById('newProjectName').value.trim();
+  const type = document.getElementById('newProjectType').value;
+  if (!name) { document.getElementById('newProjectName').focus(); return; }
+  const p = createProject(name, type);
+  state.projects.push(p);
+  closeAddModal();
+  showProject(p.id);
+  autoSaveAndRender();
+  showToast('🏗 Chantier créé');
+}
+
+function deleteProject(e, id) {
+  e.stopPropagation();
+  if (!confirm('Supprimer ce chantier ? Toutes les données seront perdues.')) return;
+  state.projects = state.projects.filter(p => p.id !== id);
+  if (state.currentProjectId === id) { state.currentView = 'dashboard'; state.currentProjectId = null; }
+  autoSaveAndRender();
+  showToast('🗑 Chantier supprimé');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on overlay click
+document.getElementById('addModal').addEventListener('click', function(e) {
+  if (e.target === this) closeAddModal();
+});
+
+// Enter key in modal
+document.getElementById('newProjectName').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') addProject();
+});
+
+// Auto-save every 30s
+setInterval(() => {
+  if (state.projects.length > 0) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    updateSaveIndicator();
+  }
+}, 30000);
+
+// ─────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────
+loadState();
+render();
+</script>
+
+
+</body></html>
