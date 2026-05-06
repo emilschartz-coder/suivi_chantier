@@ -1,0 +1,20 @@
+{
+  "name": "Wiesenpiront",
+  "short_name": "WP",
+  "description": "Suivi de chantier Wiesenpiront",
+  "start_url": "/suivi-chantier-WP/",
+  "scope": "/suivi-chantier-WP/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#ffffff",
+  "theme_color": "#3d7a3d",
+  "lang": "fr",
+  "icons": [
+    {
+      "src": "logoWP.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
