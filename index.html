@@ -352,6 +352,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(
   window._fbReady  = true;
 
   document.dispatchEvent(new Event('firebaseReady'));
+  window.allowedCompany = "wp";
 </script>
 </head>
 <body>
@@ -514,6 +515,16 @@ async function doLogin() {
   btn.disabled = true; btn.textContent = 'Connexion…'; err.textContent = '';
   try {
     await window._fbSignIn(email, pw);
+    const user = window._fbCurrentUser();
+
+const snap = await window._fbGet(`users/${user.uid}`);
+const data = snap.val();
+
+if(data.companyId !== window.allowedCompany){
+    alert("Kein Zugriff für diese Firma");
+    await window._fbSignOut();
+    return;
+}
     // onAuthStateChanged handles the rest
   } catch(e) {
     const msgs = {
