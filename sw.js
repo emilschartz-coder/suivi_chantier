@@ -1,10 +1,9 @@
-const CACHE = 'wp-v2';
-const BASE = '/suivi-chantier-WP';
+const CACHE = 'wp-v3';
 const ASSETS = [
-  BASE + '/',
-  BASE + '/index.html',
-  BASE + '/manifest.json',
-  BASE + '/logoWP.png'
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/logoWP.png'
 ];
 
 self.addEventListener('install', e => {
@@ -31,7 +30,7 @@ self.addEventListener('fetch', e => {
           caches.open(CACHE).then(c => c.put(e.request, clone));
           return res;
         })
-        .catch(() => caches.match(BASE + '/index.html'))
+        .catch(() => caches.match('/index.html'))
     );
     return;
   }
