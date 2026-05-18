@@ -4737,9 +4737,9 @@ async function saveSTAccount(){
       const allCheck=document.getElementById('stAcc_all');
       const allowedChantiers=allCheck?.checked?[]:[...document.querySelectorAll('.stAcc-ch:checked')].map(cb=>+cb.value);
       const existing=await window._fbGet(_adminWorkersPath()+'/'+st.uid).catch(()=>({}));
-      const updated={...existing,email,allowedChantiers};
+      const updated={...(existing||{}),email,allowedChantiers,adminUid:_uid,name:st.name};
       await window._fbSet(_adminWorkersPath()+'/'+st.uid,updated);
-      await window._fbSet('workerMap/'+st.uid,updated);
+      window._fbSet('workerMap/'+st.uid,updated).catch(e=>console.warn('workerMap update failed (non-critical):',e.message));
       showToast('✅ Accès mis à jour pour '+st.name);
     }
     closeModal('stAccountModal');
