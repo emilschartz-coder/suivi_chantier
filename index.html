@@ -8865,6 +8865,7 @@ function renderOverviewView(cid){
     +'<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">'
     +'<button class="kunden-detail-back" onclick="showChantierHub('+cid+')">&#8592; '+escHtml(ch.name||'')+'</button>'
     +'<div style="font-size:20px;font-weight:800;flex:1">&#128203; Vue d\'ensemble &mdash; '+escHtml(ch.name||'')+'</div>'
+    +'<button onclick="_ovExportExcel('+cid+')" style="background:#1a7a4a;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px;">&#128196; Exporter Excel</button>'
     +'</div>'
     // Filter bar
     +'<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;background:#fff;border:1px solid var(--paper3);border-radius:12px;padding:.75rem 1rem;">'
@@ -8889,6 +8890,212 @@ function renderOverviewView(cid){
     +'</table>'
     +'</div>'
     +'</div>';
+}
+
+async function _ovExportExcel(cid){
+  if(typeof ExcelJS==='undefined'){showToast('⏳ Chargement ExcelJS…');return;}
+  var ch=getChantier(cid);
+  if(!ch)return;
+  var aptPhases=(ch.phases||[]).filter(function(p){return p.type==='apt'&&(p.appartements||[]).length>0;});
+  if(!aptPhases.length)return;
+
+  var allApts=[];
+  aptPhases.forEach(function(ph){(ph.appartements||[]).forEach(function(a){allApts.push({apt:a,ph:ph});});});
+  var stepNames=(allApts[0].apt.steps||[]).map(function(s,i){return {i:i,name:s.name};});
+
+  // Apply same filters as view
+  var f=_ovFilter;
+  var hasFocus=f.etapes.size>0;
+  var visSteps=hasFocus?stepNames.filter(function(sn){return f.etapes.has(sn.i);}):stepNames;
+
+  var shown=allApts.filter(function(x){
+    var a=x.apt;
+    if(f.floor&&_aptFloor(a.name)!==f.floor)return false;
+    var pins=_aptPins(a);
+    if(f.problemsOnly&&pins.length===0)return false;
+    if(f.progress!=='all'){
+      var done=a.steps.filter(function(s){return s.done;}).length;
+      var total=a.steps.length;
+      var pct=total?done/total:0;
+      if(f.progress==='done'&&pct<1)return false;
+      if(f.progress==='inprogress'&&(pct===0||pct===1))return false;
+      if(f.progress==='notstarted'&&pct>0)return false;
+    }
+    return true;
+  });
+
+  var grouped={};var floorOrder=[];
+  shown.forEach(function(x){
+    var fl=_aptFloor(x.apt.name);
+    if(!grouped[fl]){grouped[fl]=[];floorOrder.push(fl);}
+    grouped[fl].push(x);
+  });
+
+  var wb=new ExcelJS.Workbook();
+  wb.creator='ChantierPro'; wb.created=new Date();
+  var ws=wb.addWorksheet('Vue d\'ensemble',{views:[{state:'frozen',xSplit:1,ySplit:3}]});
+
+  // Color palette
+  var COL={done:'FF27AE60',prog:'FFF39C12',can:'FF3498DB',block:'FFE74C3C',none:'FFD5D8DC',
+           hdr:'FF1A252F',floorBg:'FFE8ECF0',aptCol:'FFF8F9FA',white:'FFFFFFFF',
+           probBg:'FFFDECEA',probFg:'FFC0392B'};
+
+  var thin={style:'thin',color:{argb:'FFD0D3D9'}};
+  var borders={top:thin,left:thin,bottom:thin,right:thin};
+
+  function fnt(bold,sz,argb){return {name:'Calibri',bold:!!bold,size:sz||11,color:{argb:argb||'FF1A1A1A'}};}
+  function fill(argb){return {type:'pattern',pattern:'solid',fgColor:{argb:argb}};}
+  function aln(h,v,wrap){return {horizontal:h||'left',vertical:v||'middle',wrapText:!!wrap};}
+
+  // ── Row 1: Title ────────────────────────────────────────────────────────────
+  var totalCols=1+visSteps.length+1; // apt + steps + problems
+  ws.addRow([]);
+  var titleRow=ws.getRow(1);
+  titleRow.height=30;
+  ws.mergeCells(1,1,1,totalCols);
+  var titleCell=ws.getCell('A1');
+  titleCell.value='Vue d\'ensemble — '+ch.name;
+  titleCell.font={name:'Calibri',bold:true,size:16,color:{argb:COL.white}};
+  titleCell.fill=fill(COL.hdr);
+  titleCell.alignment=aln('left','middle');
+
+  // ── Row 2: Meta ─────────────────────────────────────────────────────────────
+  ws.addRow([]);
+  ws.mergeCells(2,1,2,totalCols);
+  var metaCell=ws.getCell('A2');
+  var metaParts=[];
+  metaParts.push('Exporté le '+new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}));
+  metaParts.push(shown.length+' lot'+(shown.length!==1?'s':''));
+  if(f.floor) metaParts.push('Niveau: '+f.floor);
+  if(f.progress!=='all') metaParts.push('Avancement: '+({done:'Terminé',inprogress:'En cours',notstarted:'Non commencé'}[f.progress]||''));
+  if(hasFocus) metaParts.push(f.etapes.size+' étape'+(f.etapes.size>1?'s':'')+' filtrée'+(f.etapes.size>1?'s':''));
+  metaCell.value=metaParts.join('   ·   ');
+  metaCell.font=fnt(false,10,'FF666666');
+  metaCell.fill=fill('FFECF0F1');
+  metaCell.alignment=aln('left','middle');
+
+  // ── Row 3: Column headers ────────────────────────────────────────────────────
+  ws.addRow([]);
+  var hdrRow=ws.getRow(3);
+  hdrRow.height=80;
+
+  var hdrApt=ws.getCell(3,1);
+  hdrApt.value='Appartement';
+  hdrApt.font=fnt(true,11,COL.white);
+  hdrApt.fill=fill(COL.hdr);
+  hdrApt.alignment=aln('left','middle');
+  hdrApt.border=borders;
+
+  visSteps.forEach(function(sn,ci){
+    var cell=ws.getCell(3,2+ci);
+    cell.value=sn.name;
+    cell.font=fnt(true,10,COL.white);
+    cell.fill=fill(COL.hdr);
+    cell.alignment={horizontal:'center',vertical:'bottom',wrapText:false,textRotation:90};
+    cell.border=borders;
+  });
+  var probHdr=ws.getCell(3,2+visSteps.length);
+  probHdr.value='⚠ Prob.';
+  probHdr.font=fnt(true,10,COL.white);
+  probHdr.fill=fill(COL.hdr);
+  probHdr.alignment=aln('center','middle');
+  probHdr.border=borders;
+
+  // ── Data rows ────────────────────────────────────────────────────────────────
+  function getStatus(a,sn){
+    var s=a.steps[sn.i];
+    if(!s)return null;
+    if(s.done)return 'done';
+    if(s.inprogress||s.startedAt)return 'prog';
+    var allPreq=!s.prereqs||s.prereqs.length===0||s.checked&&s.checked.every(function(v){return v;});
+    return allPreq?'can':'block';
+  }
+  var statusSymbol={done:'✓',prog:'↻',can:'→',block:'✗'};
+  var statusLabel={done:'Terminé',prog:'En cours',can:'Peut démarrer',block:'Bloqué'};
+  var statusColor={done:COL.done,prog:COL.prog,can:COL.can,block:COL.block};
+
+  floorOrder.forEach(function(fl){
+    // Floor header row
+    var fr=ws.addRow([fl.toUpperCase()]);
+    fr.height=18;
+    ws.mergeCells(fr.number,1,fr.number,totalCols);
+    var flCell=ws.getCell(fr.number,1);
+    flCell.font=fnt(true,10,'FF2C3E50');
+    flCell.fill=fill(COL.floorBg);
+    flCell.alignment=aln('left','middle');
+    flCell.border={bottom:{style:'thin',color:{argb:'FFAAB0BB'}}};
+
+    grouped[fl].forEach(function(x){
+      var a=x.apt;
+      var pins=_aptPins(a);
+      var rowData=[a.name];
+      visSteps.forEach(function(sn){
+        var st=getStatus(a,sn);
+        rowData.push(st?statusSymbol[st]:'');
+      });
+      rowData.push(pins.length>0?pins.length:'✓');
+      var dr=ws.addRow(rowData);
+      dr.height=22;
+
+      // Apt name cell
+      var aptCell=dr.getCell(1);
+      aptCell.font=fnt(true,11);
+      aptCell.fill=fill(COL.aptCol);
+      aptCell.alignment=aln('left','middle');
+      aptCell.border=borders;
+
+      // Status cells
+      visSteps.forEach(function(sn,ci){
+        var st=getStatus(a,sn);
+        var cell=dr.getCell(2+ci);
+        cell.font={name:'Calibri',bold:true,size:12,color:{argb:COL.white}};
+        cell.fill=fill(st?statusColor[st]:COL.none);
+        cell.alignment=aln('center','middle');
+        cell.border=borders;
+        if(st) cell.note=statusLabel[st]+': '+sn.name;
+      });
+
+      // Problems cell
+      var probCell=dr.getCell(2+visSteps.length);
+      var hasPins=pins.length>0;
+      probCell.font={name:'Calibri',bold:hasPins,size:11,color:{argb:hasPins?COL.probFg:'FF27AE60'}};
+      probCell.fill=fill(hasPins?COL.probBg:COL.white);
+      probCell.alignment=aln('center','middle');
+      probCell.border=borders;
+      if(hasPins&&pins.length>0){
+        probCell.note=pins.map(function(p){return '• '+p.title;}).join('\n');
+      }
+    });
+  });
+
+  // ── Column widths ────────────────────────────────────────────────────────────
+  ws.getColumn(1).width=22;
+  for(var ci=0;ci<visSteps.length;ci++) ws.getColumn(2+ci).width=5;
+  ws.getColumn(2+visSteps.length).width=9;
+
+  // ── Legend sheet ─────────────────────────────────────────────────────────────
+  var wl=wb.addWorksheet('Légende');
+  wl.columns=[{width:20},{width:30}];
+  wl.addRow(['Couleur','Signification']).font=fnt(true,11);
+  [{c:COL.done,l:'Terminé (100%)'},{c:COL.prog,l:'En cours'},{c:COL.can,l:'Peut démarrer'},{c:COL.block,l:'Bloqué'}].forEach(function(x){
+    var r=wl.addRow(['',x.l]);
+    r.getCell(1).fill=fill(x.c);
+    r.getCell(1).border=borders;
+    r.height=18;
+  });
+
+  // ── Download ─────────────────────────────────────────────────────────────────
+  showToast('⏳ Génération Excel…');
+  var buf=await wb.xlsx.writeBuffer();
+  var blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;
+  var dateStr=new Date().toISOString().slice(0,10);
+  a.download='VueEnsemble_'+(ch.name||'Chantier').replace(/\s+/g,'_')+'_'+dateStr+'.xlsx';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+  showToast('✅ Excel exporté !');
 }
 
 function _ovFocusStep(idx){
@@ -9156,6 +9363,8 @@ document.addEventListener('click',function(e){
 
 <!-- PDF.js for plan annotation -->
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" onload="if(typeof pdfjsLib!=='undefined')pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'"></script>
+<!-- ExcelJS for Vue d'ensemble export -->
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </body></html>
 
 
