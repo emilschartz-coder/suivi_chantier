@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 // ── Config ────────────────────────────────────────────────────────────────────
 const FROM_NAME    = process.env.FROM_NAME    || 'ChantierPro';
-const FROM_EMAIL   = process.env.FROM_EMAIL   || 'onboarding@resend.dev'; // remplace par ton domaine vérifié
+const FROM_EMAIL   = process.env.FROM_EMAIL   || 'contact@chantierpro.eu';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';                 // ex. https://ton-site.com
 // ─────────────────────────────────────────────────────────────────────────────
 
