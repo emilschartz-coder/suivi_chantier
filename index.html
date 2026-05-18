@@ -1,4 +1,3 @@
-﻿<!DOCTYPE html>
 <html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -217,6 +216,45 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .ftab.active .ftab-count{background:rgba(255,255,255,.2);}
 .filter-empty{text-align:center;padding:3rem 1rem;color:var(--ink3);font-size:13px;}
 
+/* DOC CODE GENERATOR */
+.doccode-preview{font-family:'DM Mono',monospace;font-size:20px;font-weight:700;letter-spacing:.08em;color:var(--accent);background:linear-gradient(135deg,#e8f9ef,#f0f7ff);border:2px solid var(--accent2);border-radius:12px;padding:1rem 1.5rem;text-align:center;margin-bottom:1.25rem;word-break:break-all;min-height:52px;display:flex;align-items:center;justify-content:center;}
+.doccode-preview.invalid{color:#aaa;border-color:var(--paper3);background:var(--paper2);}
+.doccode-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;margin-bottom:.75rem;}
+.doccode-grid label{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:2px;display:block;}
+.doccode-grid input,.doccode-grid select{width:100%;border:1.5px solid var(--paper3);border-radius:8px;padding:7px 9px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;box-sizing:border-box;}
+.doccode-grid input:focus,.doccode-grid select:focus{border-color:var(--accent2);outline:none;}
+.doccode-section{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:.75rem 0 .4rem;padding-bottom:4px;border-bottom:1px solid var(--paper3);}
+.doccode-rev-badge{display:inline-flex;align-items:center;gap:.5rem;background:var(--paper2);border:1.5px solid var(--paper3);border-radius:8px;padding:5px 12px;font-size:13px;font-family:'DM Mono',monospace;font-weight:600;}
+.doccode-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.doccode-list-item{background:#fff;border:1px solid var(--paper3);border-radius:10px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.75rem;cursor:default;}
+.doccode-list-item:hover{border-color:var(--accent2);}
+.doccode-code{font-family:'DM Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);flex:1;}
+.doccode-meta{font-size:11px;color:var(--ink3);}
+/* PICKER CARD DELETE BUTTON */
+.picker-card-del{position:absolute;top:8px;right:8px;z-index:10;width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,.08);color:var(--ink3);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s;}
+.picker-card:hover .picker-card-del{opacity:1;}
+.picker-card-del:hover{background:#faeaea;color:#c0392b!important;}
+.picker-card-body{display:contents;}
+/* LOT TABS (checklist multi-phase) */
+.lot-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;padding:.5rem .75rem;background:#fff;border:1px solid var(--paper3);border-radius:12px;box-shadow:var(--shadow);}
+.lot-tab{display:flex;align-items:center;gap:.4rem;padding:.45rem .9rem;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink2);transition:all .15s;border:1.5px solid transparent;}
+.lot-tab:hover{background:var(--paper2);border-color:var(--paper3);}
+.lot-tab.active{background:var(--accent);color:#fff;border-color:var(--accent2);}
+.lot-tab.active .lot-tab-pct{color:rgba(255,255,255,.8);}
+.lot-tab-pct{font-size:11px;font-weight:500;color:var(--ink3);font-family:'DM Mono',monospace;}
+/* OVERVIEW TABLE */
+.ov-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.ov-table{border-collapse:collapse;width:100%;table-layout:auto;}
+.ov-table thead th{background:var(--paper2);font-size:11px;font-weight:700;color:var(--ink3);white-space:nowrap;}
+.ov-table tbody tr:hover td{background:#f7faf9!important;}
+.ov-table tbody tr:hover td:first-child,.ov-table tbody tr:hover td:last-child{background:#edf5f0!important;}
+/* LOT PICKER CARDS (in modal) */
+.lot-pick-card{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:2px;padding:.75rem .5rem;border:2px solid var(--paper3);border-radius:12px;cursor:pointer;transition:all .15s;background:#fff;user-select:none;}
+.lot-pick-card:hover{border-color:var(--accent2);background:var(--paper2);}
+.lot-pick-card.selected{border-color:var(--accent);background:var(--accent);color:#fff;}
+.lot-pick-card.selected div{color:#fff!important;}
+.lot-pick-check{display:none;position:absolute;top:5px;right:7px;font-size:11px;font-weight:800;}
+.lot-pick-card.selected .lot-pick-check{display:block;}
 /* PROGRESS */
 .progress-overview{background:#fff;border-radius:var(--radius-lg);padding:1.25rem 1.5rem;border:1px solid var(--paper3);box-shadow:var(--shadow);margin-bottom:1.5rem;}
 .progress-overview-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
@@ -727,6 +765,159 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   .step-block,.kpi-card,.proj-card{box-shadow:none;break-inside:avoid;border:1px solid #ddd;}
   .prereqs{display:block!important;}.project-notes-body{display:block!important;}
 }
+
+/* ══ FULLSCREEN LAYOUT (Dashboard + Chantier Hub) ══ */
+.layout.fullscreen .sidebar{display:none!important;}
+.layout.fullscreen .main{max-width:100%;width:100%;padding:0;}
+
+/* ── Chantier Picker ── */
+.picker-screen{min-height:calc(100vh - 68px);background:var(--paper);padding:2.5rem 2rem;}
+.picker-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+.picker-title{font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.5px;}
+.picker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.5rem;}
+.picker-card span{background:none;} .picker-card{background:#fff;border:2px solid var(--paper3);border-radius:16px;padding:1.75rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative;overflow:hidden;}
+.picker-card:hover{border-color:var(--accent2);box-shadow:0 8px 32px rgba(26,107,58,.15);transform:translateY(-3px);}
+.picker-card-accent{position:absolute;top:0;left:0;right:0;height:4px;border-radius:16px 16px 0 0;}
+.picker-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.25rem;}
+.picker-card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.picker-card-status{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--paper2);color:var(--ink3);}
+.picker-card-name{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:.4rem;line-height:1.2;}
+.picker-card-meta{font-size:13px;color:var(--ink3);margin-bottom:.2rem;display:flex;align-items:center;gap:.4rem;}
+.picker-card-prog{margin-top:1.1rem;}
+.picker-card-prog-label{display:flex;justify-content:space-between;margin-bottom:5px;}
+.picker-card-prog-label span{font-size:11px;color:var(--ink3);}
+.picker-card-prog-label strong{font-size:13px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;}
+.picker-prog-bar{height:8px;background:var(--paper3);border-radius:4px;overflow:hidden;}
+.picker-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
+.picker-card-footer{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--paper2);display:flex;gap:1rem;flex-wrap:wrap;}
+.picker-tag{font-size:11px;color:var(--ink3);display:flex;align-items:center;gap:.3rem;background:none!important;}
+.picker-empty{text-align:center;padding:5rem 2rem;color:var(--ink3);}
+.picker-empty-icon{font-size:4rem;margin-bottom:1rem;}
+
+/* ── Chantier Hub ── */
+.hub-screen{min-height:calc(100vh - 68px);background:var(--paper);padding:2rem;}
+.hub-topbar{display:flex;align-items:center;gap:1rem;margin-bottom:.75rem;flex-wrap:wrap;}
+.hub-back{background:#fff;border:1.5px solid var(--paper3);border-radius:10px;padding:9px 16px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--ink2);display:flex;align-items:center;gap:.4rem;transition:all .15s;flex-shrink:0;}
+.hub-back:hover{border-color:var(--accent2);color:var(--ink);}
+.hub-title{font-size:24px;font-weight:800;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hub-prog-inline{display:flex;align-items:center;gap:.75rem;flex-shrink:0;}
+.hub-prog-track{width:120px;height:8px;background:var(--paper3);border-radius:4px;overflow:hidden;}
+.hub-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;}
+.hub-prog-pct{font-size:14px;font-weight:700;color:var(--ink);font-family:'DM Mono',monospace;}
+.hub-client-bar{background:#fff;border:1px solid var(--paper3);border-radius:10px;padding:.75rem 1.25rem;display:flex;gap:2rem;flex-wrap:wrap;margin-bottom:1.5rem;font-size:13px;color:var(--ink2);}
+.hub-client-item{display:flex;align-items:center;gap:.4rem;}
+.hub-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+.hub-tile{background:#fff;border:1.5px solid var(--paper3);border-radius:14px;padding:1.5rem;cursor:pointer;transition:all .2s;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;gap:.6rem;position:relative;overflow:hidden;}
+.hub-tile:hover{border-color:var(--accent2);box-shadow:0 6px 24px rgba(26,107,58,.13);transform:translateY(-2px);}
+.hub-tile-icon{font-size:2rem;line-height:1;}
+.hub-tile-name{font-size:15px;font-weight:700;color:var(--ink);}
+.hub-tile-meta{font-size:12px;color:var(--ink3);line-height:1.4;}
+.hub-tile-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.hub-tile-prog{height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;margin-top:auto;}
+.hub-tile-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;}
+@media(max-width:600px){
+  .picker-grid{grid-template-columns:1fr!important;}
+  .hub-grid{grid-template-columns:1fr 1fr!important;}
+  .picker-title{font-size:22px;}
+}
+
+/* ══ ALWAYS FULLSCREEN — no sidebar ══ */
+.sidebar{display:none!important;}
+#sidebarToggle{display:none!important;}
+#sidebarOverlay{display:none!important;}
+.layout{display:block!important;}
+.main{max-width:100%!important;width:100%!important;}
+
+/* ══ KUNDEN / CLIENTS MODULE ══ */
+.kunden-view{padding:2rem;max-width:1100px;margin:0 auto;}
+.kunden-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.kunden-title{font-size:22px;font-weight:700;color:var(--ink);}
+.kunden-search{padding:9px 14px;border:1.5px solid var(--paper3);border-radius:9px;font-size:13px;font-family:inherit;width:240px;background:#fff;transition:border .15s;}
+.kunden-search:focus{outline:none;border-color:var(--accent2);}
+.kunden-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
+.kunden-card{background:#fff;border:1.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
+.kunden-card:hover{border-color:var(--accent2);box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.kunden-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;}
+.kunden-name{font-size:15px;font-weight:700;color:var(--ink);}
+.kunden-typ-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;}
+.ktyp-privat{background:#ddf0e0;color:#1a6b3a;}.ktyp-promoteur{background:#e0e8f8;color:#0b1d4d;}.ktyp-entreprise{background:#f5ece0;color:#9a7040;}
+.kunden-card-meta{font-size:12px;color:var(--ink3);margin-bottom:.5rem;}
+.kunden-card-action{font-size:12px;color:var(--ink2);background:var(--paper2);border-radius:6px;padding:6px 10px;margin-top:.5rem;}
+.kunden-card-projs{display:flex;flex-wrap:wrap;gap:4px;margin-top:.6rem;}
+.kunden-proj-tag{font-size:11px;background:var(--paper2);border:1px solid var(--paper3);border-radius:5px;padding:2px 8px;color:var(--ink2);}
+.kunden-empty{text-align:center;padding:4rem 2rem;color:var(--ink3);}
+.kunden-empty-icon{font-size:3rem;margin-bottom:1rem;}
+.kunden-detail{padding:2rem;max-width:760px;margin:0 auto;}
+.kunden-detail-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.kunden-detail-back{background:none;border:1.5px solid var(--paper3);border-radius:8px;padding:7px 14px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--ink2);transition:all .15s;}
+.kunden-detail-back:hover{border-color:var(--accent2);color:var(--ink);}
+.kunden-detail-name{font-size:20px;font-weight:700;flex:1;}
+.kunden-detail-del{background:none;border:1.5px solid rgba(138,26,26,.3);color:var(--red);border-radius:8px;padding:7px 14px;font-size:12px;font-family:inherit;cursor:pointer;transition:all .15s;}
+.kunden-detail-del:hover{background:var(--red-bg);}
+.kunden-field-group{background:#fff;border:1.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.kunden-field-group h4{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.kunden-field-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem;}
+.kunden-field-row.single{grid-template-columns:1fr;}
+.kunden-label{font-size:11px;font-weight:600;color:var(--ink3);display:block;margin-bottom:4px;}
+.kunden-input{width:100%;padding:8px 11px;border:1.5px solid var(--paper3);border-radius:7px;font-size:13px;font-family:inherit;background:#fff;transition:border .15s;}
+.kunden-input:focus{outline:none;border-color:var(--accent2);}
+.kunden-linked-proj{background:#fff;border:1.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.kunden-linked-proj h4{font-size:11px;font-weight:700;color:var(--ink3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:1rem;}
+.kunden-proj-item{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--paper2);}
+.kunden-proj-prog{flex:1;}
+.kunden-proj-prog-bar{height:4px;background:var(--paper3);border-radius:2px;overflow:hidden;margin-top:4px;}
+.kunden-proj-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;}
+.kunden-proj-link{background:none;border:1.5px solid var(--paper3);border-radius:6px;padding:5px 11px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--ink2);transition:all .15s;white-space:nowrap;}
+.kunden-proj-link:hover{border-color:var(--accent2);color:var(--ink);}
+/* ══ STATISTIQUES ══ */
+.stats-view{padding:2rem;max-width:1100px;margin:0 auto;}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-bottom:1.5rem;}
+.stats-card{background:#fff;border:1px solid var(--paper3);border-radius:var(--radius-lg);padding:1.5rem;box-shadow:var(--shadow);}
+.stats-card-title{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:1.25rem;}
+.stats-bar-row{display:flex;align-items:center;gap:.75rem;margin-bottom:.65rem;}
+.stats-bar-label{font-size:12px;color:var(--ink2);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.stats-bar-track{flex:1;height:8px;background:var(--paper3);border-radius:4px;overflow:hidden;}
+.stats-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;}
+.stats-bar-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--ink3);width:36px;text-align:right;flex-shrink:0;}
+.stats-proj-row{display:flex;align-items:center;gap:.75rem;padding:.6rem 0;border-bottom:1px solid var(--paper2);cursor:pointer;transition:background .1s;}
+.stats-proj-row:last-child{border:none;}
+.stats-proj-row:hover{background:var(--paper);border-radius:6px;}
+.stats-proj-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.stats-proj-info{flex:1;min-width:0;}
+/* ══ LIVRAISON MODULE ══ */
+.livraison-view{padding:2rem;max-width:1100px;margin:0 auto;}
+.livraison-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem;}
+.livraison-title{font-size:22px;font-weight:700;}
+.livraison-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;}
+.livr-card{background:#fff;border:1.5px solid var(--paper3);border-radius:var(--radius-lg);padding:1.25rem;cursor:pointer;transition:all .15s;box-shadow:var(--shadow);}
+.livr-card:hover{border-color:var(--accent2);box-shadow:var(--shadow-md);transform:translateY(-1px);}
+.livr-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;}
+.livr-name{font-size:15px;font-weight:700;}
+.livr-status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.livr-attente{background:#f5ece0;color:#9a7040;}.livr-livre{background:#ddf0e0;color:#1a6b3a;}.livr-reserves{background:#faeaea;color:#8a1a1a;}
+.livr-meta{font-size:12px;color:var(--ink3);margin-bottom:.5rem;}
+.livr-reserves-count{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--red);font-weight:600;}
+.livr-detail{padding:2rem;max-width:760px;margin:0 auto;}
+.livr-detail-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;}
+.reserve-row{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem 0;border-bottom:1px solid var(--paper2);}
+.reserve-row:last-child{border:none;}
+.reserve-check{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--paper3);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .15s;font-size:12px;}
+.reserve-check.done{background:var(--green);border-color:var(--green);color:#fff;}
+.reserve-info{flex:1;}
+.reserve-text{font-size:13px;color:var(--ink2);line-height:1.4;}
+.reserve-text.done{color:var(--ink3);text-decoration:line-through;}
+.reserve-lot{font-size:11px;color:var(--ink3);margin-top:2px;}
+.reserve-del{background:none;border:none;color:var(--ink3);cursor:pointer;padding:2px 6px;font-size:14px;opacity:0;transition:opacity .15s;flex-shrink:0;}
+.reserve-row:hover .reserve-del{opacity:1;}
+.reserve-del:hover{color:var(--red);}
+.reserve-add-row{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap;}
+.reserve-add-input{flex:1;min-width:150px;padding:8px 12px;border:1.5px dashed var(--paper3);border-radius:8px;font-size:13px;font-family:inherit;background:transparent;outline:none;}
+.reserve-add-input:focus{border-color:var(--accent2);background:#fff;}
+@media(max-width:768px){
+  .kunden-field-row{grid-template-columns:1fr!important;}
+  .stats-grid{grid-template-columns:1fr!important;}
+  .livraison-grid{grid-template-columns:1fr!important;}
+}
 </style>
 
 <script type="module">
@@ -886,6 +1077,18 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
       <div class="nav-icon" style="background:#e8f5e9">📁</div>
       <div class="nav-info"><div class="nav-name">Mes Documents</div><div class="nav-meta" id="docsNavMeta">—</div></div>
     </div>
+        <div class="nav-item" id="navKunden" onclick="showKunden();closeSidebarMobile()">
+      <div class="nav-icon" style="background:#ddf0e0">&#128101;</div>
+      <div class="nav-info"><div class="nav-name">Clients</div><div class="nav-meta" id="kundenNavMeta">&#8212;</div></div>
+    </div>
+    <div class="nav-item" id="navStats" onclick="showStats();closeSidebarMobile()">
+      <div class="nav-icon" style="background:#e8f0fe">&#128202;</div>
+      <div class="nav-info"><div class="nav-name">Statistiques</div><div class="nav-meta" id="statsNavMeta">Vue d&#39;ensemble</div></div>
+    </div>
+    <div class="nav-item" id="navLivraison" onclick="showLivraison();closeSidebarMobile()">
+      <div class="nav-icon" style="background:#fff3e0">&#127968;</div>
+      <div class="nav-info"><div class="nav-name">Livraisons</div><div class="nav-meta" id="livraisonNavMeta">&#8212;</div></div>
+    </div>
     <div class="sidebar-title" style="margin-top:1rem">Mes chantiers</div>
     <div id="chantierList"></div>
     <button class="add-btn" id="addChantierBtn" onclick="openAddChantierModal()">＋ Nouveau chantier</button>
@@ -893,6 +1096,190 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   <main class="main" id="mainContent">
     <div class="empty-state"><div class="es-icon">⏳</div><h3>Chargement…</h3></div>
   </main>
+</div>
+
+<!-- Modal: Nouveau client -->
+<div class="modal-overlay" id="kundeModal">
+  <div class="modal">
+    <h3 id="kundeModalTitle">Nouveau client</h3>
+    <input type="hidden" id="kundeModalId">
+    <label>Nom <span style="color:var(--red)">*</span></label>
+    <input type="text" id="kundeModalName" placeholder="Nom du client...">
+    <label>Type</label>
+    <select id="kundeModalTyp">
+      <option value="Privat">Privat</option>
+      <option value="Promoteur">Promoteur</option>
+      <option value="Entreprise">Entreprise</option>
+    </select>
+    <label>Téléphone</label>
+    <input type="tel" id="kundeModalTel" placeholder="+352 ...">
+    <label>E-mail</label>
+    <input type="email" id="kundeModalEmail" placeholder="client@email.com">
+    <label>Statut</label>
+    <select id="kundeModalStatus">
+      <option value="Aktiv">Actif</option>
+      <option value="Abgeschlossen">Clôturé</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('kundeModal')">Annuler</button>
+      <button class="btn-confirm" onclick="saveKundeModal()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Générateur de code document WP -->
+<div class="modal-overlay" id="docCodeModal">
+  <div class="modal" style="width:600px;max-width:96vw;max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-bottom:.25rem;">📋 Générateur de code document</h3>
+    <p style="font-size:12px;color:var(--ink3);margin-bottom:.75rem;">[CHANTIER][CAD][BÂT][ÉTAGE][APT]_[CORPS]_[ENT]_[TYPE][N°][RÉV]</p>
+    <input type="hidden" id="dcId">
+    <!-- LIVE PREVIEW -->
+    <div class="doccode-preview invalid" id="dcPreview">— code —</div>
+
+    <div class="doccode-section">Identification du projet</div>
+    <div class="doccode-grid">
+      <div>
+        <label>Chantier <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--ink3)">(ex: BEL)</span></label>
+        <input id="dcChan" maxlength="6" placeholder="BEL" oninput="this.value=this.value.toUpperCase();_dcPreview()" style="text-transform:uppercase;">
+      </div>
+      <div>
+        <label>Lot cadastral <span style="font-weight:400;color:var(--ink3)">(défaut: 0)</span></label>
+        <input id="dcCad" maxlength="4" placeholder="0" oninput="_dcPreview()">
+      </div>
+      <div>
+        <label>Bâtiment <span style="font-weight:400;color:var(--ink3)">(lettre ou 0)</span></label>
+        <input id="dcBat" maxlength="2" placeholder="A" oninput="this.value=this.value.toUpperCase();_dcPreview()">
+      </div>
+      <div>
+        <label>Étage <span style="color:var(--red)">*</span></label>
+        <select id="dcEtage" onchange="_dcPreview()">
+          <option value="">— sélectionner —</option>
+          <option value="S2">S2 — 2ème sous-sol</option>
+          <option value="S1">S1 — 1er sous-sol</option>
+          <option value="0">0 — Rez-de-chaussée</option>
+          <option value="1">1 — Étage 1</option>
+          <option value="2">2 — Étage 2</option>
+          <option value="3">3 — Étage 3</option>
+          <option value="4">4 — Étage 4</option>
+          <option value="5">5 — Étage 5</option>
+          <option value="TT">TT — Toiture</option>
+          <option value="TN">TN — Tous niveaux</option>
+        </select>
+      </div>
+      <div>
+        <label>Appartement <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--ink3)">(n° ou TZ)</span></label>
+        <input id="dcApt" maxlength="4" placeholder="01" oninput="this.value=this.value.toUpperCase();_dcPreview()">
+      </div>
+    </div>
+
+    <div class="doccode-section">Corps d'état & Entreprise</div>
+    <div class="doccode-grid">
+      <div>
+        <label>Corps d'état <span style="color:var(--red)">*</span></label>
+        <select id="dcCorps" onchange="_dcPreview()">
+          <option value="">— sélectionner —</option>
+          <option value="SS">SS — Terrassement / Sous-sol</option>
+          <option value="BE">BE — Bureau d'études</option>
+          <option value="BC">BC — Bureau de contrôle</option>
+          <option value="TER">TER — Terrassement</option>
+          <option value="GO">GO — Gros œuvre</option>
+          <option value="CC">CC — Couverture / Charpente</option>
+          <option value="ETA">ETA — Étanchéité</option>
+          <option value="ISO">ISO — Isolation</option>
+          <option value="MEXT">MEXT — Menuiseries extérieures</option>
+          <option value="SER">SER — Serrurerie</option>
+          <option value="PG">PG — Peinture générale</option>
+          <option value="ECH">ECH — Échafaudage</option>
+          <option value="FAC">FAC — Façade</option>
+          <option value="HVAC">HVAC — Chauffage / Ventilation</option>
+          <option value="ELEC">ELEC — Électricité</option>
+          <option value="CF">CF — Cloisons / Faux-plafonds</option>
+          <option value="PLA">PLA — Plafonnage</option>
+          <option value="CHA">CHA — Chauffage sol / Chape</option>
+          <option value="CAR">CAR — Carrelage</option>
+          <option value="PAR">PAR — Parquet</option>
+          <option value="MINT">MINT — Menuiseries intérieures</option>
+          <option value="PCF">PCF — Plafonds flottants</option>
+          <option value="PEI">PEI — Peinture</option>
+          <option value="ASC">ASC — Ascenseur</option>
+          <option value="COM">COM — Communication / Domotique</option>
+        </select>
+      </div>
+      <div>
+        <label>Entreprise <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--ink3)">(trigramme, ex: CAR)</span></label>
+        <input id="dcEnt" maxlength="6" placeholder="CAR" oninput="this.value=this.value.toUpperCase();_dcPreview()">
+      </div>
+    </div>
+
+    <div class="doccode-section">Type de document</div>
+    <div class="doccode-grid">
+      <div>
+        <label>Type <span style="color:var(--red)">*</span></label>
+        <select id="dcType" onchange="_dcAutoNum();_dcPreview()">
+          <option value="">— sélectionner —</option>
+          <option value="PLN">PLN — Plan</option>
+          <option value="DET">DET — Détail</option>
+          <option value="NDC">NDC — Note de Calcul</option>
+          <option value="PLA">PLA — Planning</option>
+          <option value="NTC">NTC — Note Technique</option>
+          <option value="SCH">SCH — Schéma</option>
+          <option value="PPS">PPS — PPSS</option>
+          <option value="DEV">DEV — Devis</option>
+          <option value="LET">LET — Lettre</option>
+          <option value="NOM">NOM — Nomenclature</option>
+          <option value="CRC">CRC — Compte rendu</option>
+          <option value="FPR">FPR — Fiche Produit</option>
+          <option value="LID">LID — Liste de Documents</option>
+          <option value="CON">CON — Contrat</option>
+          <option value="AVE">AVE — Avenant</option>
+        </select>
+      </div>
+      <div>
+        <label>Numéro <span style="color:var(--red)">*</span> <span style="font-weight:400;color:var(--ink3)">(auto)</span></label>
+        <input id="dcNum" type="number" min="1" max="99" placeholder="01" oninput="_dcPreview()">
+      </div>
+    </div>
+
+    <div class="doccode-section">Révision</div>
+    <div class="doccode-row">
+      <div class="doccode-rev-badge" id="dcRevDisplay">1ère version — pas de suffixe</div>
+      <input type="hidden" id="dcRev" value="">
+      <button id="dcRevBtn" onclick="_dcNewRevision()" style="display:none;background:var(--paper2);border:1.5px solid var(--paper3);border-radius:8px;padding:6px 12px;font-size:12px;font-family:inherit;cursor:pointer;">📝 Nouvelle révision</button>
+    </div>
+
+    <div id="dcErrors" style="display:none;background:#faeaea;color:#8a1a1a;border-radius:8px;padding:.6rem 1rem;font-size:12px;margin-top:.5rem;"></div>
+
+    <div class="modal-btns" style="margin-top:1rem;">
+      <button class="btn-cancel" onclick="closeModal('docCodeModal')">Annuler</button>
+      <button class="btn-confirm" id="dcSaveBtn" onclick="saveDocCode()">💾 Enregistrer le code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nouvelle livraison -->
+<div class="modal-overlay" id="livraisonModal">
+  <div class="modal">
+    <h3 id="livraisonModalTitle">Nouveau lot à livrer</h3>
+    <input type="hidden" id="livraisonModalId">
+    <label>Nom / Référence <span style="color:var(--red)">*</span></label>
+    <input type="text" id="livraisonModalName" placeholder="ex. Lot 4, Apt. 2.1...">
+    <label>Chantier</label>
+    <select id="livraisonModalChantier"></select>
+    <label>Client</label>
+    <select id="livraisonModalKunde"><option value="">-- Aucun --</option></select>
+    <label>Date de livraison prévue</label>
+    <input type="date" id="livraisonModalDate">
+    <label>Statut</label>
+    <select id="livraisonModalStatus">
+      <option value="En attente">En attente</option>
+      <option value="Livré">Livré</option>
+      <option value="Réserves en cours">Réserves en cours</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('livraisonModal')">Annuler</button>
+      <button class="btn-confirm" onclick="saveLivraisonModal()">Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 <!-- Modal: Nouveau chantier -->
@@ -903,12 +1290,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <input type="text" id="newChantierName" placeholder="ex. Belleg, Maison Müller…">
     <label>Localisation <span style="font-weight:400;color:var(--ink3)">(ville — pour la météo)</span></label>
     <input type="text" id="newChantierLocation" placeholder="ex. Luxembourg, Esch-sur-Alzette…">
-    <label>Première phase</label>
-    <select id="newChantierType">
-      <option value="go">🏗 Gros œuvre (17 étapes)</option>
-      <option value="apt">🏠 Résidence — second œuvre (20 étapes)</option>
-      <option value="maison">🏡 Maison — construction complète (26 étapes)</option>
-    </select>
+    <label>Lots / Types de travaux <span style="font-weight:400;color:var(--ink3)">(un ou plusieurs)</span></label>
+    <div id="chantierLotPicker" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.25rem;"></div>
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeModal('addChantierModal')">Annuler</button>
       <button class="btn-confirm" onclick="addChantier()">Créer</button>
@@ -1151,6 +1534,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <h3>🏢 Profil entreprise</h3>
     <label>Nom de l'entreprise</label>
     <input type="text" id="profileCompanyName" placeholder="ex. Wiesen Piront SA">
+    <label style="margin-top:10px">Render API URL <span style="font-weight:400;color:var(--ink3)">(pour les emails automatiques)</span></label>
+    <input type="url" id="profileRenderUrl" placeholder="https://chantierpro-mailer.onrender.com" style="font-size:12px;">
     <label>Logo (glisser-déposer ou cliquer)</label>
     <div class="logo-drop-zone" id="logoDropZone"
       onclick="document.getElementById('logoFileInput').click()"
@@ -1210,17 +1595,20 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   <div class="modal" style="width:400px">
     <h3 id="contactModalTitle">👤 Ajouter un contact</h3>
     <label>Rôle *</label>
-    <input type="text" id="contactRoleInput" placeholder="Ex: Maître d'ouvrage, Architecte, Ingénieur…" list="contactRoleList" maxlength="60">
-    <datalist id="contactRoleList">
-      <option value="Maître d'ouvrage">
-      <option value="Architecte">
-      <option value="Bureau d'études">
-      <option value="Ingénieur structure">
-      <option value="Coordinateur sécurité">
-      <option value="Géomètre">
-      <option value="Notaire">
-      <option value="Directeur Informatique">
-    </datalist>
+    <select id="contactRoleInput" onchange="toggleContactRoleCustom()" style="width:100%;border:1.5px solid var(--paper3);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;color:var(--ink);background:#fff;margin-bottom:.5rem;">
+      <option value="">— Sélectionner un rôle —</option>
+      <option value="Maître d'ouvrage">Maître d'ouvrage</option>
+      <option value="Architecte">Architecte</option>
+      <option value="Bureau d'études">Bureau d'études</option>
+      <option value="Ingénieur structure">Ingénieur structure</option>
+      <option value="Bureau de contrôle">Bureau de contrôle</option>
+      <option value="Coordinateur sécurité">Coordinateur sécurité</option>
+      <option value="Géomètre">Géomètre</option>
+      <option value="Notaire">Notaire</option>
+      <option value="Promoteur">Promoteur</option>
+      <option value="autre">✏ Autre (saisir manuellement)</option>
+    </select>
+    <input type="text" id="contactRoleCustomInput" placeholder="Saisir le rôle…" maxlength="60" style="display:none;width:100%;border:1.5px solid var(--accent2);border-radius:8px;padding:9px 12px;font-size:14px;font-family:inherit;box-sizing:border-box;margin-bottom:.5rem;">
     <label>Nom *</label>
     <input type="text" id="contactNameInput" placeholder="Prénom Nom" maxlength="80">
     <label>Entreprise / Société</label>
@@ -1453,7 +1841,7 @@ async function doLogin(){
       _allowedChantiers=sess.allowedChantiers||[];_workerName=sess.workerName||'';
       hideLoginScreen({email:sess.email});
       setSyncStatus('offline');
-      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},plannings:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null,currentPlanningId:null};
+      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},plannings:[],kunden:[],livraisons:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null,currentPlanningId:null};
       render();startFirebaseListener();initAiChat();
       _applyNetworkState(false);
       return;
@@ -1473,9 +1861,11 @@ async function doLogin(){
 }
 async function doLogout(){ await window._fbSignOut(); }
 function showLoginScreen(){ document.getElementById('loginScreen').style.display='flex'; document.getElementById('loginBtn').disabled=false; document.getElementById('loginBtn').textContent='Se connecter'; document.getElementById('loginError').textContent=''; document.getElementById('loginPassword').value=''; setTimeout(()=>document.getElementById('loginEmail').focus(),100); }
+let _adminEmail=null; // admin email for resolve notifications
 function hideLoginScreen(user){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('userBadge').textContent=_isWorker?('👤 '+_workerName):user.email;
+  if(!_isWorker) _adminEmail=user.email||null;
   const adminBtns=document.getElementById('adminHeaderBtns');
   if(adminBtns) adminBtns.style.display=_isWorker?'none':'contents';
 }
@@ -1643,7 +2033,7 @@ function getPhaseTemplate(ph){
 //  RENDER SIDEBAR
 // ════════════════════════════════════════
 function renderSidebar(){
-  document.getElementById('navDash').classList.toggle('active',state.currentView==='dashboard');
+  document.getElementById('navDash').classList.toggle('active',state.currentView==='dashboard'||state.currentView==='chantierHub');
   document.getElementById('navProblems')?.classList.toggle('active',state.currentView==='problems');
   // Team button: admin only
   const navTeam=document.getElementById('navTeam');
@@ -1660,7 +2050,17 @@ function renderSidebar(){
   if(navPl) navPl.classList.toggle('active',state.currentView==='planning');
   const pm=document.getElementById('planningNavMeta');
   if(pm){ const pl=state.plannings||[]; if(!pl.length){pm.textContent='—';} else{ const palerts=getPlanningAlerts(); pm.innerHTML=palerts.length?`<span style="color:var(--red);font-weight:600">⚠️ ${palerts.length} alerte${palerts.length>1?'s':''}</span>`:(pl.reduce((a,p)=>a+(p.tasks||[]).length,0)+' tâches'); } }
-  _updateProbMeta();
+  const navK=document.getElementById('navKunden');
+  if(navK) navK.classList.toggle('active',state.currentView==='kunden'||state.currentView==='kundenDetail');
+  const kundenM=document.getElementById('kundenNavMeta');
+  if(kundenM){ const kc=(state.kunden||[]).length; kundenM.textContent=kc===0?'—':kc+' client'+(kc>1?'s':''); }
+  const navSt=document.getElementById('navStats');
+  if(navSt) navSt.classList.toggle('active',state.currentView==='stats');
+  const navLv=document.getElementById('navLivraison');
+  if(navLv) navLv.classList.toggle('active',state.currentView==='livraison'||state.currentView==='livraisonDetail');
+  const livrM=document.getElementById('livraisonNavMeta');
+  if(livrM){ const lc=(state.livraisons||[]).length; const rc=(state.livraisons||[]).reduce((a,l)=>a+(l.reserves||[]).filter(r=>!r.done).length,0); livrM.textContent=lc===0?'—':(rc>0?rc+' réserve'+(rc>1?'s':'')+' ouvertes':lc+' lot'+(lc>1?'s':'')); }
+    _updateProbMeta();
   const navDocs=document.getElementById('navDocs');
   if(navDocs) navDocs.classList.toggle('active',state.currentView==='documents');
   const docsM=document.getElementById('docsNavMeta');
@@ -1921,7 +2321,8 @@ function renderChecklist(cid,pid){
   const pnOpen=_projectNotesOpen?'open':'';
 
   document.getElementById('mainContent').innerHTML=`<div class="checklist-view">
-    <div class="checklist-header">
+    <div class="checklist-header" style="flex-wrap:wrap;gap:.5rem;">
+      <button class="kunden-detail-back" onclick="state.currentChantierId?showChantierHub(state.currentChantierId):showDashboard()" style="flex-shrink:0;">&#8592; Chantier</button>
       <div class="checklist-title-group">
         <div class="checklist-type">${tmpl.icon} ${tmpl.label}${!_isWorker?` <button class="icon-btn" onclick="renamePhase(${cid},${pid})" title="Renommer la phase" style="font-size:11px;padding:2px 7px;margin-left:6px;opacity:.55">✏</button>`:''}</div>
         <div class="checklist-title" ${!_isWorker?`ondblclick="inlineEditChantierName(${cid})" title="Double-cliquer pour renommer" style="cursor:pointer"`:``}>${escHtml(ch.name)}</div>
@@ -1940,6 +2341,7 @@ function renderChecklist(cid,pid){
       </div>
     </div>
     <div id="weatherCard_${cid}"></div>
+    ${ch.phases.length>1?`<div class="lot-tabs">${ch.phases.map(p=>{const ti=getPhaseTemplate(p);const pr=p.appartements&&p.appartements.length?{pct:Math.round(p.appartements.reduce((a,a2)=>a+a2.steps.filter(s=>s.done).length,0)/Math.max(1,p.appartements.reduce((a,a2)=>a+a2.steps.length,0))*100)}:getProgress(p);return `<div class="lot-tab${p.id===pid?' active':''}" onclick="showProject(${cid},${p.id})">${ti.icon} ${ti.label}<span class="lot-tab-pct">${pr.pct}%</span></div>`;}).join('')}</div>`:''}
     <div class="progress-overview">
       <div class="progress-overview-header"><span class="progress-overview-label">Avancement global</span><span class="progress-overview-value">${progLabel}</span></div>
       <div class="progress-bar-main"><div class="progress-bar-main-fill" style="width:${prog.pct}%"></div></div>
@@ -1957,7 +2359,7 @@ function renderChecklist(cid,pid){
     ${renderContactsCard(cid)}
     ${renderPlansCard(cid)}
     ${ph.type==='apt'?renderAptSection(cid,pid):''}
-    ${!isAptMode?`<div class="filter-bar">${filterTabs}</div>${stepsHtml}<button class="add-step-btn" onclick="addStep(${cid},${pid})">＋ Ajouter une étape</button>`:''}
+    ${(ph.type!=='apt')?`<div class="filter-bar">${filterTabs}</div>${stepsHtml}<button class="add-step-btn" onclick="addStep(${cid},${pid})">＋ Ajouter une étape</button>`:''}
   </div>`;
   loadWeather(cid);
 }
@@ -1981,8 +2383,50 @@ function markDone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si];
 function markUndone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; s.done=false;s.inprogress=false;s.checked=s.checked.map(()=>false);s.open=true;s.doneAt=null;s.startedAt=null; autoSave();render();showToast('↩ Étape réouverte'); }
 
 // Chantier CRUD
-function openAddChantierModal(){ document.getElementById('newChantierName').value=''; document.getElementById('addChantierModal').classList.add('open'); setTimeout(()=>document.getElementById('newChantierName').focus(),100); }
-function addChantier(){ const name=document.getElementById('newChantierName').value.trim(); const type=document.getElementById('newChantierType').value; const location=(document.getElementById('newChantierLocation')?.value||'').trim(); if(!name)return; state.chantiers.push({id:Date.now(),name,location,expanded:true,plans:[],phases:[createPhase(type)]}); closeModal('addChantierModal'); document.getElementById('newChantierLocation').value=''; autoSave();render();showToast('🏗 Chantier créé'); }
+function openAddChantierModal(){
+  document.getElementById('newChantierName').value='';
+  if(document.getElementById('newChantierLocation')) document.getElementById('newChantierLocation').value='';
+  // Render lot picker cards
+  const picker=document.getElementById('chantierLotPicker');
+  if(picker){
+    picker.innerHTML=Object.entries(TEMPLATES).map(([key,tmpl])=>`
+      <div class="lot-pick-card" id="lotCard_${key}" onclick="toggleLotCard('${key}')" data-key="${key}">
+        <div style="font-size:22px;margin-bottom:2px">${tmpl.icon}</div>
+        <div style="font-size:12px;font-weight:700;color:var(--ink)">${tmpl.label}</div>
+        <div style="font-size:11px;color:var(--ink3)">${tmpl.steps.length} étapes</div>
+        <div class="lot-pick-check">✓</div>
+      </div>`).join('');
+    // Default: select GO
+    const goCard=document.getElementById('lotCard_go');
+    if(goCard) goCard.classList.add('selected');
+  }
+  document.getElementById('addChantierModal').classList.add('open');
+  setTimeout(()=>document.getElementById('newChantierName').focus(),100);
+}
+function toggleLotCard(key){
+  const el=document.getElementById('lotCard_'+key);
+  if(el) el.classList.toggle('selected');
+}
+function addChantier(){
+  const name=document.getElementById('newChantierName').value.trim();
+  const location=(document.getElementById('newChantierLocation')?.value||'').trim();
+  if(!name)return;
+  const selectedCards=Array.from(document.querySelectorAll('#chantierLotPicker .lot-pick-card.selected'));
+  const selectedTypes=selectedCards.map(el=>el.dataset.key);
+  if(!selectedTypes.length){alert('Sélectionnez au moins un lot.');return;}
+  const base=Date.now();
+  const phases=selectedTypes.map((type,i)=>{const p=createPhase(type);p.id=base+i;return p;});
+  const chantierId=base+selectedTypes.length;
+  state.chantiers.push({id:chantierId,name,location,expanded:true,plans:[],phases});
+  closeModal('addChantierModal');
+  autoSave();
+  // Go directly to first phase of the new chantier
+  state.currentView='project';
+  state.currentChantierId=chantierId;
+  state.currentPhaseId=phases[0].id;
+  render();
+  showToast('🏗 Chantier créé');
+}
 function openRenameModal(cid){ const c=getChantier(cid); document.getElementById('renameChantierId').value=cid; document.getElementById('renameChantierName').value=c.name; document.getElementById('renameChantierLocation').value=c.location||''; document.getElementById('renameModal').classList.add('open'); setTimeout(()=>{const el=document.getElementById('renameChantierName');el.select();},100); }
 function confirmRename(){ const cid=+document.getElementById('renameChantierId').value; const name=document.getElementById('renameChantierName').value.trim(); const loc=document.getElementById('renameChantierLocation').value.trim(); if(!name)return; const c=getChantier(cid); c.name=name; const oldLoc=c.location||''; c.location=loc; if(loc!==oldLoc) delete _weatherCache[cid]; closeModal('renameModal');autoSave();render();showToast('✏ Enregistré'); }
 function deleteChantier(cid){ if(!confirm('Supprimer ce chantier et toutes ses phases ?'))return; state.chantiers=state.chantiers.filter(c=>c.id!==cid); if(state.currentChantierId===cid){state.currentView='dashboard';state.currentChantierId=null;state.currentPhaseId=null;} autoSave();render();showToast('🗑 Supprimé'); }
@@ -2137,6 +2581,16 @@ function deleteApt(cid,pid,aptId){
   _selectedApts.delete(aptId);
   if(_currentAptId===aptId) _currentAptId=null;
   autoSave(); showProject(cid,pid); showToast('🗑 Appartement supprimé');
+}
+
+function setAptKunde(aptId,cid,pid,kundeId){
+  const ph=getPhase(cid,pid); if(!ph)return;
+  const apt=(ph.appartements||[]).find(a=>a.id===aptId); if(!apt)return;
+  apt.kundeId=kundeId||null;
+  autoSave();
+  const k=kundeId?(state.kunden||[]).find(x=>String(x.id)===String(kundeId)):null;
+  showToast(k?'👤 Client assigné : '+k.name:'👤 Client retiré');
+  showProject(cid,pid);
 }
 
 // ── BULK SELECTION ────────────────────────────────────────────────────────────
@@ -2323,6 +2777,7 @@ function renderAptSection(cid,pid){
         <button class="apt-card-del" onclick="deleteApt(${cid},${pid},'${apt.id}')" title="Supprimer">×</button>
       </div>
       <div class="apt-card-name">🏠 ${escHtml(apt.name)}</div>
+      ${(()=>{const k=apt.kundeId?(state.kunden||[]).find(x=>String(x.id)===String(apt.kundeId)):null;return k?`<div style="font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px;">👤 ${escHtml(k.name||'')}</div>`:'<div style="font-size:11px;color:var(--ink3);margin-bottom:4px;">👤 —</div>';})()}
       <div class="apt-card-prog"><div class="apt-card-prog-fill" style="width:${p.pct}%"></div></div>
       <div class="apt-card-meta">${p.done}/${p.total} étapes · ${p.pct}%${apt.plans&&apt.plans.length?' · 📄 '+apt.plans.length+' plan'+(apt.plans.length>1?'s':''):''}</div>
     </div>`;
@@ -2413,6 +2868,24 @@ function renderAptDetail(cid,pid,apt){
     <div class="progress-overview" style="margin-bottom:1rem">
       <div class="progress-bar-main"><div class="progress-bar-main-fill" style="width:${p.pct}%"></div></div>
     </div>
+    ${(()=>{
+      const k=apt.kundeId?(state.kunden||[]).find(x=>String(x.id)===String(apt.kundeId)):null;
+      const selectHtml=`<div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;padding:.7rem 1rem;border-bottom:${k?'1px solid var(--paper3)':'none'};">
+        <span style="font-size:13px;color:var(--ink3);flex-shrink:0;">👤 Client</span>
+        <select onchange="setAptKunde('${apt.id}',${cid},${pid},this.value)" style="flex:1;min-width:160px;border:1.5px solid var(--paper3);border-radius:8px;padding:6px 10px;font-size:13px;font-family:inherit;color:var(--ink);background:#fff;cursor:pointer;">
+          <option value="">— Non assigné —</option>
+          ${(state.kunden||[]).map(kk=>`<option value="${escHtml(String(kk.id))}"${k&&String(k.id)===String(kk.id)?' selected':''}>${escHtml(kk.name||'')}</option>`).join('')}
+        </select>
+      </div>`;
+      const detailHtml=k?`<div style="padding:.75rem 1rem;display:grid;grid-template-columns:1fr 1fr;gap:.4rem .75rem;">
+        <div style="font-size:13px;font-weight:700;color:var(--ink);grid-column:1/-1">✓ ${escHtml(k.name||'')}<span style="font-size:11px;font-weight:400;color:var(--ink3);margin-left:.5rem">${escHtml(k.typ||'')}</span></div>
+        ${k.tel?`<a href="tel:${escHtml(k.tel)}" style="font-size:12px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:.3rem;">📞 ${escHtml(k.tel)}</a>`:''}
+        ${k.email?`<a href="mailto:${escHtml(k.email)}" style="font-size:12px;color:var(--accent);text-decoration:none;display:flex;align-items:center;gap:.3rem;">✉ ${escHtml(k.email)}</a>`:''}
+        ${k.status?`<div style="font-size:11px;color:var(--ink3);">Statut : ${escHtml(k.status)}</div>`:''}
+        <button onclick="showKundenDetail('${escHtml(String(k.id))}')" style="grid-column:1/-1;margin-top:.25rem;background:none;border:1px solid var(--paper3);border-radius:7px;padding:5px 12px;font-size:12px;font-family:inherit;cursor:pointer;color:var(--ink2);text-align:left;">&#8594; Voir fiche client complète</button>
+      </div>`:'';
+      return `<div style="background:#fff;border:1px solid var(--paper3);border-radius:10px;margin-bottom:1rem;overflow:hidden;">${selectHtml}${detailHtml}</div>`;
+    })()}
     ${plansHtml}
     <div class="filter-bar" style="margin-bottom:1rem">
       <button class="ftab active" style="cursor:default">Toutes les étapes <span class="ftab-count">${apt.steps.length}</span></button>
@@ -3620,13 +4093,14 @@ function confirmAddPin(){
   const plan=_annAptMode?_viewerPlan:(getChantier(_annCid)?.plans?.[_annPlanIdx]);
   if(!plan)return;
   plan.pins=plan.pins||[];
+  const createdAt=new Date().toISOString();
   plan.pins.push({
     id:Date.now(),x:_pendingPinX,y:_pendingPinY,
     title,note,category:cat,
     assignedSTId,
     assignedWorkerUid,
     photo:_pinPhotoB64||null,
-    createdAt:new Date().toISOString(),
+    createdAt,
     resolvedBy:null,resolvedAt:null,resolveNote:'',resolvePhoto:null
   });
   document.getElementById('pinModal').classList.remove('open');
@@ -3637,6 +4111,77 @@ function confirmAddPin(){
   renderPins(_annCid,_annPlanIdx);
   renderSidebar();
   _updateProbMeta();
+  // Auto-notify assigned ST by email
+  if(assignedSTId&&cat!=='info'){
+    const st=state.sousTraitants.find(s=>s.id===assignedSTId);
+    if(st&&st.email){
+      const chantier=getChantier(_annCid);
+      _sendProblemNotification({title,note,category:cat,photo:_pinPhotoB64||null,createdAt},st,chantier?.name||'',plan.name||'');
+    }
+  }
+}
+
+// ── Render email notification ──────────────────────────────────────────────
+async function _sendProblemNotification(pin, st, chantierName, planName){
+  const apiUrl=(state.profile&&state.profile.renderApiUrl)||'';
+  if(!apiUrl){
+    // No Render URL configured — silently skip (user hasn't set it up yet)
+    return;
+  }
+  try {
+    const resp=await fetch(apiUrl+'/send-problem',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        to:st.email,
+        stName:st.name||'',
+        title:pin.title||'',
+        note:pin.note||'',
+        category:pin.category||'problem',
+        chantierName:chantierName||'',
+        planName:planName||'',
+        createdAt:pin.createdAt||new Date().toISOString(),
+        photoB64:(pin.photo&&pin.photo.length<500000)?pin.photo:null // skip if photo too big
+      })
+    });
+    const data=await resp.json();
+    if(data.ok){
+      showToast('📧 Notification envoyée à '+escHtml(st.name));
+    } else {
+      console.warn('[mailer] send-problem error:',data.error);
+      showToast('⚠ Email non envoyé: '+(data.error||'erreur serveur'));
+    }
+  } catch(e){
+    console.warn('[mailer] fetch error:',e.message);
+    showToast('⚠ Serveur email injoignable');
+  }
+}
+// ───────────────────────────────────────────────────────────────────────────
+
+async function _sendResolvedNotification(data, adminEmail){
+  const apiUrl=(state.profile&&state.profile.renderApiUrl)||'';
+  if(!apiUrl||!adminEmail) return;
+  try{
+    const resp=await fetch(apiUrl+'/send-resolved',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        to:adminEmail,
+        title:data.title||'',
+        note:data.note||'',
+        resolvedBy:data.resolvedBy||'',
+        resolveNote:data.resolveNote||'',
+        resolvePhoto:data.resolvePhoto||null,
+        originalPhoto:data.originalPhoto||null,
+        chantierName:data.chantierName||'',
+        planName:data.planName||'',
+        resolvedAt:data.resolvedAt||new Date().toISOString()
+      })
+    });
+    const d=await resp.json();
+    if(d.ok) showToast('📧 Notification envoyée');
+    else console.warn('[mailer] send-resolved:',d.error);
+  }catch(e){ console.warn('[mailer] resolved fetch error:',e.message); }
 }
 
 function openResolvePinModal(cid,planIdx,pinId){
@@ -3670,6 +4215,23 @@ function confirmResolvePin(){
   _updateProbMeta();
   renderProblemsViewIfActive();
   showToast('✅ Résolu par '+name);
+  // Notify admin by email
+  const _notifAdminEmail=_adminEmail||(state.profile&&state.profile.notifEmail)||null;
+  if(_notifAdminEmail){
+    const _notifChantier=getChantier(cid);
+    const _notifPlan=_resolvingPin?.aptMode?_viewerPlan:_notifChantier?.plans?.[planIdx];
+    _sendResolvedNotification({
+      title:pin.title||'',
+      note:pin.note||'',
+      resolvedBy:name,
+      resolveNote:note,
+      resolvePhoto:(pin.resolvePhoto&&pin.resolvePhoto.length<500000)?pin.resolvePhoto:null,
+      originalPhoto:(pin.photo&&pin.photo.length<500000)?pin.photo:null,
+      chantierName:_notifChantier?.name||'',
+      planName:_notifPlan?.name||'',
+      resolvedAt:pin.resolvedAt
+    },_notifAdminEmail);
+  }
 }
 
 function _updateProbMeta(){
@@ -3759,6 +4321,9 @@ function renderProblemsView(){
 
   const openCount=allPins.filter(x=>x.pin.category!=='solved').length;
   document.getElementById('mainContent').innerHTML=`<div class="problems-view">
+    <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem">
+      <button class="kunden-detail-back" onclick="state.currentChantierId?showChantierHub(state.currentChantierId):showDashboard()">&#8592; ${state.currentChantierId?(()=>{const _c=getChantier(state.currentChantierId);return _c?_esc(_c.name):'Accueil';})():'Accueil'}</button>
+    </div>
     <div class="page-title">📍 Problèmes & Annotations</div>
     <div class="page-sub">${openCount} problème${openCount!==1?'s':''} ouvert${openCount!==1?'s':''} sur tous les chantiers</div>
     <div class="prob-filter-bar">${filterBar}</div>
@@ -3847,10 +4412,30 @@ function toggleContactsCard(cid){
   const card=document.getElementById('contactsCard_'+cid);
   if(card) card.classList.toggle('open',_contactsOpen[cid]);
 }
+function toggleContactRoleCustom(){
+  const sel=document.getElementById('contactRoleInput');
+  const custom=document.getElementById('contactRoleCustomInput');
+  if(sel.value==='autre'){custom.style.display='block';custom.focus();}
+  else{custom.style.display='none';custom.value='';}
+}
+function _getContactRole(){
+  const sel=document.getElementById('contactRoleInput');
+  if(sel.value==='autre') return document.getElementById('contactRoleCustomInput').value.trim();
+  return sel.value.trim();
+}
+function _setContactRole(role){
+  const sel=document.getElementById('contactRoleInput');
+  const custom=document.getElementById('contactRoleCustomInput');
+  const knownValues=Array.from(sel.options).map(o=>o.value);
+  if(knownValues.includes(role)){sel.value=role;custom.style.display='none';custom.value='';}
+  else if(role){sel.value='autre';custom.style.display='block';custom.value=role;}
+  else{sel.value='';custom.style.display='none';custom.value='';}
+}
 function openAddContactModal(cid){
   _contactCid=cid;_contactEditId=null;
   document.getElementById('contactModalTitle').textContent='👤 Ajouter un contact';
-  ['Role','Name','Company','Phone','Email'].forEach(f=>document.getElementById('contact'+f+'Input').value='');
+  _setContactRole('');
+  ['Name','Company','Phone','Email'].forEach(f=>document.getElementById('contact'+f+'Input').value='');
   document.getElementById('contactModal').classList.add('open');
 }
 function openEditContactModal(cid,id){
@@ -3858,7 +4443,7 @@ function openEditContactModal(cid,id){
   if(!c)return;
   _contactCid=cid;_contactEditId=id;
   document.getElementById('contactModalTitle').textContent='✏️ Modifier le contact';
-  document.getElementById('contactRoleInput').value=c.role||'';
+  _setContactRole(c.role||'');
   document.getElementById('contactNameInput').value=c.name||'';
   document.getElementById('contactCompanyInput').value=c.company||'';
   document.getElementById('contactPhoneInput').value=c.phone||'';
@@ -3866,7 +4451,7 @@ function openEditContactModal(cid,id){
   document.getElementById('contactModal').classList.add('open');
 }
 function confirmSaveContact(){
-  const role=document.getElementById('contactRoleInput').value.trim();
+  const role=_getContactRole();
   const name=document.getElementById('contactNameInput').value.trim();
   if(!role){document.getElementById('contactRoleInput').focus();return;}
   if(!name){document.getElementById('contactNameInput').focus();return;}
@@ -4512,11 +5097,13 @@ function _renderWeatherCard(el,{w,name}){
 // ════════════════════════════════════════
 function openProfileModal(){
   document.getElementById('profileCompanyName').value=state.profile.companyName||'';
+  document.getElementById('profileRenderUrl').value=state.profile.renderApiUrl||'';
   renderLogoPreview(state.profile.logo);
   document.getElementById('profileModal').classList.add('open');
 }
 function saveProfile(){
   state.profile.companyName=document.getElementById('profileCompanyName').value.trim();
+  state.profile.renderApiUrl=(document.getElementById('profileRenderUrl').value||'').trim().replace(/\/$/,'');
   closeModal('profileModal');
   autoSave();
   updateHeaderLogo();
@@ -4588,19 +5175,40 @@ function closeSidebarMobile(){
   const ov=document.getElementById('sidebarOverlay');
   if(ov)ov.classList.remove('show');
 }
+function openModal(id){ document.getElementById(id).classList.add('open'); }
 function closeModal(id){ document.getElementById(id).classList.remove('open'); }
 function showToast(msg){ const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500); }
 
-function render(){ updateHeaderLogo(); renderSidebar(); if(state.currentView==='dashboard')renderDashboard(); else if(state.currentView==='project')renderChecklist(state.currentChantierId,state.currentPhaseId); else if(state.currentView==='planning')renderPlanningView(); else if(state.currentView==='documents')renderDocumentsView(); }
+function render(){
+  updateHeaderLogo();
+  renderSidebar();
+  // Toggle fullscreen mode (no sidebar) for picker + hub
+  const layout=document.querySelector('.layout');
+  const fsViews=['dashboard','chantierHub'];
+  if(layout) layout.classList.toggle('fullscreen', fsViews.includes(state.currentView));
+  
+  if(state.currentView==='dashboard')renderChantierPicker();
+  else if(state.currentView==='chantierHub')renderChantierHub(state.currentChantierId);
+  else if(state.currentView==='project')renderChecklist(state.currentChantierId,state.currentPhaseId);
+  else if(state.currentView==='planning')renderPlanningView();
+  else if(state.currentView==='documents')renderDocumentsView();
+  else if(state.currentView==='kunden')renderKundenView();
+  else if(state.currentView==='kundenDetail')renderKundenDetail(state.currentKundeId);
+  else if(state.currentView==='stats')renderStatsView();
+  else if(state.currentView==='livraison')renderLivraisonView();
+  else if(state.currentView==='livraisonDetail')renderLivraisonDetail(state.currentLivraisonId);
+  else if(state.currentView==='overview')renderOverviewView(state.currentChantierId);
+  else if(state.currentView==='docCodes')renderDocCodesView(state.currentChantierId);
+}
 
 // Modal close handlers
-['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(id=>{ document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
+['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal','kundeModal','livraisonModal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
 document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 // Escape key: close all overlays — safety net if anything gets stuck
 document.addEventListener('keydown',function(e){
   if(e.key!=='Escape') return;
-  ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal'].forEach(closeModal);
+  ['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal','kundeModal','livraisonModal'].forEach(closeModal);
   closePhotoRapport();
   closeAnnotator();
   closeEmailModal();
@@ -5236,9 +5844,11 @@ document.addEventListener('firebaseReady',()=>{
       if(window._cSave) window._cSave('__session__',{uid:_uid,email:user.email,isWorker:_isWorker,adminUid:_adminUid,allowedChantiers:_allowedChantiers,workerName:_workerName});
       hideLoginScreen(user);
       setSyncStatus('syncing');
-      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},plannings:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null,currentPlanningId:null};
+      state={chantiers:[],sousTraitants:[],profile:{logo:null,companyName:''},plannings:[],kunden:[],livraisons:[],currentView:'dashboard',currentChantierId:null,currentPhaseId:null,currentPlanningId:null};
       render();
       startFirebaseListener();
+      _kundenLoad();
+      _livraisonLoad();
       if(!_isWorker) setTimeout(()=>refreshTeamList().catch(()=>{}),1500);
       _fbLoadApiKey();
       initAiChat();
@@ -5473,7 +6083,7 @@ function renderPlanningView(){
   const plannings=state.plannings||[];
 
   if(plannings.length===0){
-    m.innerHTML=`<div style="padding:3rem;text-align:center;color:var(--ink3);">
+    m.innerHTML=`<div style="padding:1.5rem"><div style="margin-bottom:1rem"><button class="kunden-detail-back" onclick="state.currentChantierId?showChantierHub(state.currentChantierId):showDashboard()" style="flex-shrink:0;">&#8592; Chantier</button></div><div style="padding:3rem;text-align:center;color:var(--ink3);">
       <div style="font-size:52px;margin-bottom:1rem;">📅</div>
       <div style="font-size:20px;font-weight:700;color:var(--ink);margin-bottom:.5rem;">Aucun planning importé</div>
       <div style="font-size:14px;margin-bottom:1.75rem;">Importez un fichier CSV (MS Project, Excel, Numbers…)</div>
@@ -5582,6 +6192,7 @@ function renderPlanningView(){
 
     <!-- Header -->
     <div style="display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">
+      <button class="kunden-detail-back" onclick="state.currentChantierId?showChantierHub(state.currentChantierId):showDashboard()" style="flex-shrink:0;">&#8592; Chantier</button>
       <div style="flex:1;min-width:200px;">
         <div style="font-size:11px;color:var(--ink3);font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;">Planning</div>
         <div style="font-size:20px;font-weight:700;">${escHtml(planning.name)}</div>
@@ -6503,6 +7114,7 @@ function renderDocumentsView(){
     }).join('');
 
   m.innerHTML='<div style="padding:1.5rem;max-width:860px">'+
+    '<div style="margin-bottom:.75rem">' + '<button class="kunden-detail-back" onclick="showDashboard()">&#8592; Accueil</button>' + '</div>' +
     '<div class="page-title">📁 Mes Documents</div>'+
     '<div class="page-sub">'+docs.length+' document'+(docs.length!==1?'s':'')+' sauvegardé'+(docs.length!==1?'s':'')+' — imprimés automatiquement</div>'+
     '<div style="display:flex;flex-direction:column;gap:10px;margin-top:1.5rem">'+cards+'</div>'+
@@ -6875,6 +7487,1418 @@ async function _aiStreamRequest(key){
   var toolUses=content.filter(function(b){return b.type==='tool_use';});
   return{content,stop_reason,toolUses,error:null};
 }
+
+/* ═══════════════════════════════════════════════
+   KUNDEN (CLIENTS) MODULE
+═══════════════════════════════════════════════ */
+function _kundenFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/kunden'; }
+
+function _kundenLoad(){
+  window._fbGet(_kundenFbPath()).then(raw=>{
+    raw=raw||{};
+    state.kunden=Object.keys(raw).map(id=>({id,...raw[id]}));
+    renderSidebar();
+    if(state.currentView==='kunden')renderKundenView();
+    if(state.currentView==='kundenDetail')renderKundenDetail(state.currentKundeId);
+    if(state.currentView==='chantierHub')render();
+  });
+}
+
+function _kundenSave(data,id){
+  const key=id||String(Date.now());
+  return window._fbSet(_kundenFbPath()+'/'+key, data).then(()=>_kundenLoad());
+}
+
+function _kundenDelete(id){
+  return window._fbSet(_kundenFbPath()+'/'+id, null).then(()=>{
+    state.kunden=(state.kunden||[]).filter(k=>k.id!==id);
+    renderSidebar();
+  });
+}
+
+function showKunden(){
+  state.currentView='kunden';
+  render();
+}
+
+function showKundenDetail(id){
+  state.currentView='kundenDetail';
+  state.currentKundeId=id;
+  render();
+}
+
+function _buildKundenGrid(list){
+  if(!list.length) return `<div class="kunden-empty"><div class="kunden-empty-icon">&#128101;</div><p>Aucun client encore.</p><button class="btn-primary" onclick="openKundeModal()">+ Nouveau client</button></div>`;
+  return `<div class="kunden-grid">`+list.map(k=>{
+    const projs=_kundenLinkedProjects(k.id);
+    const typCls={'Privat':'ktyp-privat','Promoteur':'ktyp-promoteur','Entreprise':'ktyp-entreprise'}[k.typ||'Privat']||'ktyp-privat';
+    return `<div class="kunden-card" onclick="showKundenDetail('${k.id}')">
+      <div class="kunden-card-top">
+        <div class="kunden-name">${_esc(k.name||'')}</div>
+        <span class="kunden-typ-badge ${typCls}">${_esc(k.typ||'Privat')}</span>
+      </div>
+      ${k.email?`<div class="kunden-card-meta">&#9993; ${_esc(k.email)}</div>`:''}
+      ${k.tel?`<div class="kunden-card-meta">&#128222; ${_esc(k.tel)}</div>`:''}
+      ${k.lastAction?`<div class="kunden-card-action">&#128337; ${_esc(k.lastAction)}</div>`:''}
+      ${projs.length?`<div class="kunden-card-projs">${projs.map(p=>`<span class="kunden-proj-tag">${_esc(p.name||'')}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('')+`</div>`;
+}
+
+function filterKunden(){
+  const q=(document.getElementById('kundenSearch')||{}).value||'';
+  const list=(state.kunden||[]).filter(k=>{
+    if(!q)return true;
+    const s=(k.name+' '+(k.email||'')+' '+(k.tel||'')+' '+(k.typ||'')).toLowerCase();
+    return s.includes(q.toLowerCase());
+  });
+  const grid=document.getElementById('kundenGridWrap');
+  if(grid) grid.innerHTML=_buildKundenGrid(list);
+}
+
+function renderKundenView(){
+  const app=document.getElementById('mainContent');
+  if(!app)return;
+  const total=(state.kunden||[]).length;
+  app.innerHTML=`<div class="kunden-view">
+    <div class="kunden-header">
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.75rem;flex-wrap:wrap;">
+        <button class="kunden-detail-back" onclick="showDashboard()">&#8592; Accueil</button>
+        <div class="kunden-title">&#128101; Clients <span style="font-size:14px;font-weight:400;color:var(--ink3)">(${total})</span></div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+        <input class="kunden-search" id="kundenSearch" placeholder="&#128269; Rechercher..." oninput="filterKunden()">
+        <button class="btn-primary" onclick="openKundeModal()">+ Nouveau</button>
+      </div>
+    </div>
+    <div id="kundenGridWrap">${_buildKundenGrid(state.kunden||[])}</div>
+  </div>`;
+}
+
+function renderKundenDetail(id){
+  const app=document.getElementById('mainContent');
+  if(!app)return;
+  const k=(state.kunden||[]).find(x=>x.id===id);
+  if(!k){ showKunden(); return; }
+  const projs=_kundenLinkedProjects(id);
+  const docs=k.docs||[];
+  app.innerHTML=`<div class="kunden-detail">
+    <div class="kunden-detail-header">
+      <button class="kunden-detail-back" onclick="showKunden()">&#8592; Retour</button>
+      <div class="kunden-detail-name">${_esc(k.name||'')}</div>
+      <button class="btn-secondary" onclick="openKundeModal('${id}')">&#9998; Modifier</button>
+      <button class="kunden-detail-del" onclick="deleteKunde('${id}')">&#128465; Supprimer</button>
+    </div>
+
+    <div class="kunden-field-group">
+      <h4>Informations</h4>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">Nom</label>
+          <input class="kunden-input" value="${_esc(k.name||'')}" onchange="updateKundeField('${id}','name',this.value)">
+        </div>
+        <div>
+          <label class="kunden-label">Type</label>
+          <select class="kunden-input" onchange="updateKundeField('${id}','typ',this.value)">
+            ${['Privat','Promoteur','Entreprise'].map(t=>`<option${k.typ===t?' selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">T&eacute;l&eacute;phone</label>
+          <input class="kunden-input" type="tel" value="${_esc(k.tel||'')}" onchange="updateKundeField('${id}','tel',this.value)">
+        </div>
+        <div>
+          <label class="kunden-label">E-mail</label>
+          <input class="kunden-input" type="email" value="${_esc(k.email||'')}" onchange="updateKundeField('${id}','email',this.value)">
+        </div>
+      </div>
+      <div class="kunden-field-row single">
+        <div>
+          <label class="kunden-label">Adresse</label>
+          <input class="kunden-input" value="${_esc(k.adresse||'')}" onchange="updateKundeField('${id}','adresse',this.value)">
+        </div>
+      </div>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">Statut</label>
+          <select class="kunden-input" onchange="updateKundeField('${id}','status',this.value)">
+            ${['Aktiv','Abgeschlossen'].map(s=>`<option value="${s}"${k.status===s?' selected':''}>${s==='Aktiv'?'Actif':'Cl\xf4tur\xe9'}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <label class="kunden-label">Derni&egrave;re action</label>
+          <input class="kunden-input" value="${_esc(k.lastAction||'')}" onchange="updateKundeField('${id}','lastAction',this.value)">
+        </div>
+      </div>
+      <div class="kunden-field-row single">
+        <div>
+          <label class="kunden-label">Notes</label>
+          <textarea class="kunden-input" rows="3" onchange="updateKundeField('${id}','notes',this.value)">${_esc(k.notes||'')}</textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="kunden-linked-proj">
+      <h4>Chantiers associ&eacute;s (${projs.length})</h4>
+      ${projs.length?projs.map(p=>{
+        const pct=_projProgress(p);
+        return `<div class="kunden-proj-item">
+          <div class="kunden-proj-prog">
+            <div style="font-size:13px;font-weight:600">${_esc(p.name||'')}</div>
+            <div class="kunden-proj-prog-bar"><div class="kunden-proj-prog-fill" style="width:${pct}%"></div></div>
+          </div>
+          <span style="font-size:12px;color:var(--ink3);font-family:'DM Mono',monospace">${pct}%</span>
+          <button class="kunden-proj-link" onclick="showChantierView('${p.id}')">Ouvrir</button>
+        </div>`;
+      }).join(''):`<p style="font-size:13px;color:var(--ink3)">Aucun chantier li&eacute;.</p>`}
+    </div>
+
+    <div class="kunden-linked-proj">
+      <h4>Documents (${docs.length})</h4>
+      <div id="kundeDocsWrap">${_renderKundeDocs(k)}</div>
+      <div style="margin-top:.75rem">
+        <label class="btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;">
+          <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" onchange="uploadKundeDocs('${id}',this)">
+          &#128196; Ajouter document(s)
+        </label>
+      </div>
+    </div>
+  </div>`;
+}
+
+function _renderKundeDocs(k){
+  const docs=k.docs||[];
+  if(!docs.length) return `<p style="font-size:13px;color:var(--ink3)">Aucun document.</p>`;
+  return docs.map((d,i)=>`<div class="doc-row" style="display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--paper2);">
+    <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(d.name||'')}</span>
+    <button class="btn-icon" title="Ouvrir" onclick="openKundeDoc('${k.id}',${i})">&#128065;</button>
+    <button class="btn-icon" title="T\xe9l\xe9charger" onclick="downloadKundeDoc('${k.id}',${i})">&#11015;</button>
+    <button class="btn-icon" title="Supprimer" onclick="deleteKundeDoc('${k.id}',${i})" style="color:var(--red)">&#128465;</button>
+  </div>`).join('');
+}
+
+function openKundeDoc(kid,idx){
+  const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
+  const d=(k.docs||[])[idx]; if(!d)return;
+  if(d.url) window.open(d.url,'_blank');
+  else if(d.data){ const a=document.createElement('a'); a.href=d.data; a.target='_blank'; a.click(); }
+}
+
+function downloadKundeDoc(kid,idx){
+  const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
+  const d=(k.docs||[])[idx]; if(!d)return;
+  const a=document.createElement('a');
+  a.href=d.url||d.data||''; a.download=d.name||'document'; a.click();
+}
+
+function uploadKundeDocs(kid,input){
+  const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
+  const files=Array.from(input.files||[]); if(!files.length)return;
+  const docs=[...(k.docs||[])];
+  let done=0;
+  files.forEach(file=>{
+    const up=window._stUpload;
+    if(up){
+      up('kunden/'+kid+'/'+Date.now()+'_'+file.name, file).then(url=>{
+        docs.push({name:file.name,url,ts:Date.now()});
+        done++;
+        if(done===files.length){
+          const upd={...k}; upd.docs=docs; delete upd.id;
+          window._fbSet(_kundenFbPath()+'/'+kid, upd).then(()=>_kundenLoad());
+        }
+      });
+    } else {
+      const reader=new FileReader();
+      reader.onload=e=>{
+        docs.push({name:file.name,data:e.target.result,ts:Date.now()});
+        done++;
+        if(done===files.length){
+          const upd={...k}; upd.docs=docs; delete upd.id;
+          window._fbSet(_kundenFbPath()+'/'+kid, upd).then(()=>_kundenLoad());
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+function deleteKundeDoc(kid,idx){
+  const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
+  if(!confirm('Supprimer ce document ?'))return;
+  const docs=[...(k.docs||[])]; docs.splice(idx,1);
+  const upd={...k}; upd.docs=docs; delete upd.id;
+  window._fbSet(_kundenFbPath()+'/'+kid, upd).then(()=>_kundenLoad());
+}
+
+function _kundenLinkedProjects(kid){
+  return (state.chantiers||[]).filter(c=>c.kundeId===kid);
+}
+
+function _projProgress(p){
+  const steps=(p.phases||[]).flatMap(ph=>ph.steps||[]);
+  if(!steps.length)return 0;
+  return Math.round(steps.filter(s=>s.status==='done').length/steps.length*100);
+}
+
+function updateKundeField(id,field,value){
+  const k=(state.kunden||[]).find(x=>x.id===id); if(!k)return;
+  k[field]=value;
+  const upd={...k}; delete upd.id;
+  window._fbSet(_kundenFbPath()+'/'+id, upd).then(()=>renderSidebar());
+}
+
+function openKundeModal(id){
+  const k=id?(state.kunden||[]).find(x=>x.id===id):null;
+  document.getElementById('kundeModalTitle').textContent=k?'Modifier client':'Nouveau client';
+  document.getElementById('kundeModalId').value=id||'';
+  document.getElementById('kundeModalName').value=k?k.name||'':'';
+  document.getElementById('kundeModalTyp').value=k?k.typ||'Privat':'Privat';
+  document.getElementById('kundeModalTel').value=k?k.tel||'':'';
+  document.getElementById('kundeModalEmail').value=k?k.email||'':'';
+  document.getElementById('kundeModalStatus').value=k?k.status||'Aktiv':'Aktiv';
+  openModal('kundeModal');
+}
+
+function saveKundeModal(){
+  try{
+    const name=document.getElementById('kundeModalName').value.trim();
+    if(!name){alert('Le nom est obligatoire.');return;}
+    const id=document.getElementById('kundeModalId').value||null;
+    const data={
+      name,
+      typ:document.getElementById('kundeModalTyp').value,
+      tel:document.getElementById('kundeModalTel').value.trim(),
+      email:document.getElementById('kundeModalEmail').value.trim(),
+      status:document.getElementById('kundeModalStatus').value,
+      updatedAt:Date.now()
+    };
+    const btn=document.querySelector('#kundeModal .btn-confirm');
+    if(btn){btn.textContent='Enregistrement...';btn.disabled=true;}
+    _kundenSave(data,id||undefined).then(()=>{
+      closeModal('kundeModal');
+      if(btn){btn.textContent='Enregistrer';btn.disabled=false;}
+      showToast('Client enregistré ✓');
+      // Stay on hub if we came from hub
+      if(state.currentView==='chantierHub') render();
+      else showKunden();
+    }).catch(e=>{
+      if(btn){btn.textContent='Enregistrer';btn.disabled=false;}
+      alert('Erreur Firebase: '+e.message);
+    });
+  }catch(e){
+    alert('Erreur: '+e.message);
+  }
+}
+
+function deleteKunde(id){
+  if(!confirm('Supprimer ce client ? Cette action est irr\xe9versible.'))return;
+  _kundenDelete(id).then(()=>showKunden());
+}
+
+/* ═══════════════════════════════════════════════
+   STATISTIQUES MODULE
+═══════════════════════════════════════════════ */
+function showStats(){
+  state.currentView='stats';
+  render();
+}
+
+function renderStatsView(){
+  const app=document.getElementById('mainContent');
+  if(!app)return;
+  const chantiers=state.chantiers||[];
+  const total=chantiers.length;
+  const active=chantiers.filter(c=>c.status!=='Abgeschlossen').length;
+  const done=chantiers.filter(c=>c.status==='Abgeschlossen').length;
+  const kunden=state.kunden||[];
+  const livraisons=state.livraisons||[];
+  const openRes=livraisons.reduce((a,l)=>a+(l.reserves||[]).filter(r=>!r.done).length,0);
+
+  // Steps / progress stats
+  const allSteps=chantiers.flatMap(c=>(c.phases||[]).flatMap(ph=>ph.steps||[]));
+  const stepsDone=allSteps.filter(s=>s.status==='done').length;
+  const stepsTotal=allSteps.length;
+  const globalPct=stepsTotal?Math.round(stepsDone/stepsTotal*100):0;
+
+  // Per chantier progress for bar chart
+  const projBars=chantiers.map(c=>{
+    const steps=(c.phases||[]).flatMap(ph=>ph.steps||[]);
+    const pct=steps.length?Math.round(steps.filter(s=>s.status==='done').length/steps.length*100):0;
+    return {name:c.name||'',pct};
+  }).sort((a,b)=>b.pct-a.pct).slice(0,10);
+
+  // Phase distribution
+  const phaseMap={};
+  chantiers.forEach(c=>(c.phases||[]).forEach(ph=>{
+    const n=ph.name||'Autre';
+    phaseMap[n]=(phaseMap[n]||0)+1;
+  }));
+  const phaseEntries=Object.entries(phaseMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const phaseMax=phaseEntries.length?phaseEntries[0][1]:1;
+
+  app.innerHTML=`<div class="stats-view">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.5rem;">
+      <div style="display:flex;align-items:center;gap:1rem">
+        <button class="kunden-detail-back" onclick="showDashboard()">&#8592; Accueil</button>
+        <div style="font-size:22px;font-weight:700">&#128202; Statistiques</div>
+      </div>
+    </div>
+
+    <!-- KPI row -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem;">
+      ${[
+        {icon:'&#127959;',val:total,label:'Chantiers',color:'var(--accent)'},
+        {icon:'&#9654;',val:active,label:'En cours',color:'#2a8a50'},
+        {icon:'&#9989;',val:done,label:'Termin\xe9s',color:'#0b1d4d'},
+        {icon:'&#128101;',val:kunden.length,label:'Clients',color:'#6a4fc8'},
+        {icon:'&#127968;',val:livraisons.length,label:'Livraisons',color:'#e07b20'},
+        {icon:'&#9888;',val:openRes,label:'R\xe9serves ouvertes',color:'#8a1a1a'},
+      ].map(k=>`<div class="stats-card" style="text-align:center;">
+        <div style="font-size:2rem;margin-bottom:.4rem">${k.icon}</div>
+        <div style="font-size:28px;font-weight:800;color:${k.color}">${k.val}</div>
+        <div style="font-size:12px;color:var(--ink3);margin-top:.2rem">${k.label}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="stats-grid">
+      <!-- Avancement global -->
+      <div class="stats-card">
+        <div class="stats-card-title">Avancement global</div>
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+          <div style="font-size:36px;font-weight:800;color:var(--accent)">${globalPct}%</div>
+          <div style="flex:1">
+            <div style="font-size:12px;color:var(--ink3);margin-bottom:4px">${stepsDone} / ${stepsTotal} t\xe2ches termin\xe9es</div>
+            <div style="height:10px;background:var(--paper3);border-radius:5px;overflow:hidden">
+              <div style="height:100%;width:${globalPct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;transition:width .4s"></div>
+            </div>
+          </div>
+        </div>
+        ${projBars.map(b=>`<div class="stats-bar-row">
+          <div class="stats-bar-label" title="${_esc(b.name)}">${_esc(b.name)}</div>
+          <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${b.pct}%"></div></div>
+          <div class="stats-bar-val">${b.pct}%</div>
+        </div>`).join('')}
+      </div>
+
+      <!-- Chantiers actifs -->
+      <div class="stats-card">
+        <div class="stats-card-title">Chantiers actifs</div>
+        ${chantiers.filter(c=>c.status!=='Abgeschlossen').slice(0,8).map(c=>{
+          const pct=_projProgress(c);
+          const icon=c.icon||'&#127959;';
+          const col=c.color||'var(--paper3)';
+          return `<div class="stats-proj-row" onclick="showChantierView('${c.id}')">
+            <div class="stats-proj-icon" style="background:${col}">${icon}</div>
+            <div class="stats-proj-info">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(c.name||'')}</div>
+              <div style="height:4px;background:var(--paper3);border-radius:2px;margin-top:4px;overflow:hidden">
+                <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px"></div>
+              </div>
+            </div>
+            <span style="font-size:12px;font-family:'DM Mono',monospace;color:var(--ink3);flex-shrink:0;margin-left:.5rem">${pct}%</span>
+          </div>`;
+        }).join('')}
+        ${!chantiers.filter(c=>c.status!=='Abgeschlossen').length?`<p style="font-size:13px;color:var(--ink3)">Aucun chantier actif.</p>`:''}
+      </div>
+
+      <!-- Phases -->
+      ${phaseEntries.length?`<div class="stats-card">
+        <div class="stats-card-title">Phases les plus fr\xe9quentes</div>
+        ${phaseEntries.map(([n,v])=>`<div class="stats-bar-row">
+          <div class="stats-bar-label" title="${_esc(n)}">${_esc(n)}</div>
+          <div class="stats-bar-track"><div class="stats-bar-fill" style="width:${Math.round(v/phaseMax*100)}%"></div></div>
+          <div class="stats-bar-val">${v}</div>
+        </div>`).join('')}
+      </div>`:''}
+
+      <!-- Livraisons -->
+      ${livraisons.length?`<div class="stats-card">
+        <div class="stats-card-title">R\xe9serves & Livraisons</div>
+        ${livraisons.slice(0,6).map(l=>{
+          const open=(l.reserves||[]).filter(r=>!r.done).length;
+          const tot=(l.reserves||[]).length;
+          return `<div class="stats-proj-row" onclick="showLivraisonDetail('${l.id}')">
+            <div class="stats-proj-icon" style="background:#fff3e0">&#127968;</div>
+            <div class="stats-proj-info">
+              <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(l.name||'')}</div>
+              <div style="font-size:11px;color:var(--ink3)">${tot} r\xe9serve${tot!==1?'s':''} · ${open} ouverte${open!==1?'s':''}</div>
+            </div>
+            <span style="font-size:11px;color:${open>0?'var(--red)':'var(--green)'};font-weight:600;flex-shrink:0">${open>0?open+' &#9888;':'&#10003;'}</span>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+    </div>
+  </div>`;
+}
+
+/* ═══════════════════════════════════════════════
+   LIVRAISON MODULE
+═══════════════════════════════════════════════ */
+function _livraisonFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/livraisons'; }
+
+function _livraisonLoad(){
+  window._fbGet(_livraisonFbPath()).then(raw=>{
+    raw=raw||{};
+    state.livraisons=Object.keys(raw).map(id=>({id,...raw[id]}));
+    renderSidebar();
+    if(state.currentView==='livraison')renderLivraisonView();
+    if(state.currentView==='livraisonDetail')renderLivraisonDetail(state.currentLivraisonId);
+    if(state.currentView==='chantierHub')render();
+  });
+}
+
+function _livraisonSave(data,id){
+  const key=id||String(Date.now());
+  return window._fbSet(_livraisonFbPath()+'/'+key, data).then(()=>_livraisonLoad());
+}
+
+function _livraisonDelete(id){
+  return window._fbSet(_livraisonFbPath()+'/'+id, null).then(()=>{
+    state.livraisons=(state.livraisons||[]).filter(l=>l.id!==id);
+    renderSidebar();
+  });
+}
+
+function showLivraison(){
+  state.currentView='livraison';
+  render();
+}
+
+function showLivraisonDetail(id){
+  state.currentView='livraisonDetail';
+  state.currentLivraisonId=id;
+  render();
+}
+
+function renderLivraisonView(){
+  const app=document.getElementById('mainContent');
+  if(!app)return;
+  const livs=state.livraisons||[];
+  app.innerHTML=`<div class="livraison-view">
+    <div class="livraison-header">
+      <button class="kunden-detail-back" onclick="state.currentChantierId?showChantierHub(state.currentChantierId):showDashboard()">&#8592; Retour</button>
+      <div class="livraison-title">&#127968; Livraisons</div>
+      <button class="btn-primary" onclick="openLivraisonModal()">+ Nouvelle livraison</button>
+    </div>
+    ${livs.length?`<div class="livraison-grid">${livs.map(l=>{
+      const open=(l.reserves||[]).filter(r=>!r.done).length;
+      const tot=(l.reserves||[]).length;
+      const stCls={'En attente':'livr-attente','Livr\xe9':'livr-livre','R\xe9serves en cours':'livr-reserves'}[l.status||'En attente']||'livr-attente';
+      const chantier=(state.chantiers||[]).find(c=>c.id===l.chantierId);
+      const kunde=(state.kunden||[]).find(k=>k.id===l.kundeId);
+      return `<div class="livr-card" onclick="showLivraisonDetail('${l.id}')">
+        <div class="livr-card-top">
+          <div class="livr-name">${_esc(l.name||'')}</div>
+          <span class="livr-status-badge ${stCls}">${_esc(l.status||'En attente')}</span>
+        </div>
+        ${chantier?`<div class="livr-meta">&#127959; ${_esc(chantier.name||'')}</div>`:''}
+        ${kunde?`<div class="livr-meta">&#128101; ${_esc(kunde.name||'')}</div>`:''}
+        ${l.date?`<div class="livr-meta">&#128197; ${l.date}</div>`:''}
+        ${tot?`<div class="livr-reserves-count">&#9888; ${open} r\xe9serve${open!==1?'s':''} ouverte${open!==1?'s':''} / ${tot} total</div>`:''}
+      </div>`;
+    }).join('')}</div>`
+    :`<div class="kunden-empty"><div class="kunden-empty-icon">&#127968;</div><p>Aucune livraison enregistr&eacute;e.</p><button class="btn-primary" onclick="openLivraisonModal()">+ Nouvelle livraison</button></div>`}
+  </div>`;
+}
+
+function renderLivraisonDetail(id){
+  const app=document.getElementById('mainContent');
+  if(!app)return;
+  const l=(state.livraisons||[]).find(x=>x.id===id);
+  if(!l){ showLivraison(); return; }
+  const reserves=l.reserves||[];
+  const openCount=reserves.filter(r=>!r.done).length;
+  const chantier=(state.chantiers||[]).find(c=>c.id===l.chantierId);
+  const kunde=(state.kunden||[]).find(k=>k.id===l.kundeId);
+  const statusColors={'En attente':'livr-attente','Livr\xe9':'livr-livre','R\xe9serves en cours':'livr-reserves'};
+  const stCls=statusColors[l.status||'En attente']||'livr-attente';
+
+  app.innerHTML=`<div class="livr-detail">
+    <div class="livr-detail-header">
+      <button class="kunden-detail-back" onclick="showLivraison()">&#8592; Retour</button>
+      <div style="flex:1;font-size:20px;font-weight:700">${_esc(l.name||'')}</div>
+      <button class="btn-secondary" onclick="openLivraisonModal('${id}')">&#9998; Modifier</button>
+      <button class="kunden-detail-del" onclick="deleteLivraison('${id}')">&#128465;</button>
+    </div>
+
+    <div class="kunden-field-group">
+      <h4>Informations</h4>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">Nom / R&eacute;f&eacute;rence</label>
+          <input class="kunden-input" value="${_esc(l.name||'')}" onchange="updateLivraisonField('${id}','name',this.value)">
+        </div>
+        <div>
+          <label class="kunden-label">Statut</label>
+          <select class="kunden-input" onchange="updateLivraisonField('${id}','status',this.value)">
+            ${['En attente','Livr\xe9','R\xe9serves en cours'].map(s=>`<option${l.status===s?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">Chantier</label>
+          <input class="kunden-input" value="${chantier?_esc(chantier.name||''):'—'}" readonly style="background:var(--paper2)">
+        </div>
+        <div>
+          <label class="kunden-label">Client</label>
+          <input class="kunden-input" value="${kunde?_esc(kunde.name||''):'—'}" readonly style="background:var(--paper2)">
+        </div>
+      </div>
+      <div class="kunden-field-row">
+        <div>
+          <label class="kunden-label">Date de livraison</label>
+          <input class="kunden-input" type="date" value="${l.date||''}" onchange="updateLivraisonField('${id}','date',this.value)">
+        </div>
+        <div>
+          <label class="kunden-label">Notes</label>
+          <input class="kunden-input" value="${_esc(l.notes||'')}" onchange="updateLivraisonField('${id}','notes',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div class="kunden-field-group">
+      <h4>R&eacute;serves &amp; Non-conformit&eacute;s <span style="font-weight:400;color:var(--red)">(${openCount} ouvertes)</span></h4>
+      <div id="reservesList">
+        ${reserves.length?reserves.map((r,i)=>`<div class="reserve-row" id="resRow_${i}">
+          <div class="reserve-check${r.done?' done':''}" onclick="toggleReserve('${id}',${i})">
+            ${r.done?'&#10003;':''}
+          </div>
+          <div class="reserve-info">
+            <div class="reserve-text${r.done?' done':''}">${_esc(r.text||'')}</div>
+            ${r.lot?`<div class="reserve-lot">Lot : ${_esc(r.lot)}</div>`:''}
+          </div>
+          <button class="reserve-del" onclick="deleteReserve('${id}',${i})" title="Supprimer">&#128465;</button>
+        </div>`).join(''):
+        `<p style="font-size:13px;color:var(--ink3);padding:.5rem 0">Aucune r\xe9serve enregistr\xe9e.</p>`}
+      </div>
+      <div class="reserve-add-row">
+        <input class="reserve-add-input" id="reserveNewText" placeholder="Description de la r\xe9serve..." onkeydown="if(event.key==='Enter')addReserve('${id}')">
+        <input class="reserve-add-input" id="reserveNewLot" placeholder="Lot (optionnel)" style="flex:0 0 140px;" onkeydown="if(event.key==='Enter')addReserve('${id}')">
+        <button class="btn-primary" onclick="addReserve('${id}')">+ Ajouter</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function addReserve(livrId){
+  const textEl=document.getElementById('reserveNewText');
+  const lotEl=document.getElementById('reserveNewLot');
+  const text=(textEl?.value||'').trim();
+  if(!text)return;
+  const l=(state.livraisons||[]).find(x=>x.id===livrId); if(!l)return;
+  const reserves=[...(l.reserves||[]),{text,lot:(lotEl?.value||'').trim(),done:false,ts:Date.now()}];
+  const upd={...l}; upd.reserves=reserves; delete upd.id;
+  // Auto-set status if was "Livré"
+  if(upd.status==='Livr\xe9') upd.status='R\xe9serves en cours';
+  window._fbSet(_livraisonFbPath()+'/'+livrId, upd).then(()=>{
+    l.reserves=reserves; l.status=upd.status;
+    if(textEl) textEl.value='';
+    if(lotEl) lotEl.value='';
+    renderLivraisonDetail(livrId);
+    renderSidebar();
+  });
+}
+
+function toggleReserve(livrId,idx){
+  const l=(state.livraisons||[]).find(x=>x.id===livrId); if(!l)return;
+  const reserves=[...(l.reserves||[])];
+  if(!reserves[idx])return;
+  reserves[idx]={...reserves[idx],done:!reserves[idx].done};
+  const allDone=reserves.every(r=>r.done);
+  const upd={...l}; upd.reserves=reserves; delete upd.id;
+  if(allDone && reserves.length) upd.status='Livr\xe9';
+  else if(reserves.some(r=>!r.done)) upd.status='R\xe9serves en cours';
+  window._fbSet(_livraisonFbPath()+'/'+livrId, upd).then(()=>{
+    l.reserves=reserves; l.status=upd.status;
+    renderLivraisonDetail(livrId);
+    renderSidebar();
+  });
+}
+
+function deleteReserve(livrId,idx){
+  const l=(state.livraisons||[]).find(x=>x.id===livrId); if(!l)return;
+  if(!confirm('Supprimer cette r\xe9serve ?'))return;
+  const reserves=[...(l.reserves||[])]; reserves.splice(idx,1);
+  const upd={...l}; upd.reserves=reserves; delete upd.id;
+  if(!reserves.length) upd.status='Livr\xe9';
+  else if(reserves.some(r=>!r.done)) upd.status='R\xe9serves en cours';
+  else upd.status='Livr\xe9';
+  window._fbSet(_livraisonFbPath()+'/'+livrId, upd).then(()=>{
+    l.reserves=reserves; l.status=upd.status;
+    renderLivraisonDetail(livrId);
+    renderSidebar();
+  });
+}
+
+function updateLivraisonField(id,field,value){
+  const l=(state.livraisons||[]).find(x=>x.id===id); if(!l)return;
+  l[field]=value;
+  const upd={...l}; delete upd.id;
+  window._fbSet(_livraisonFbPath()+'/'+id, upd).then(()=>renderSidebar());
+}
+
+function openLivraisonModal(id){
+  const l=id?(state.livraisons||[]).find(x=>x.id===id):null;
+  document.getElementById('livraisonModalTitle').textContent=l?'Modifier livraison':'Nouveau lot \xe0 livrer';
+  document.getElementById('livraisonModalId').value=id||'';
+  document.getElementById('livraisonModalName').value=l?l.name||'':'';
+  document.getElementById('livraisonModalDate').value=l?l.date||'':'';
+  document.getElementById('livraisonModalStatus').value=l?l.status||'En attente':'En attente';
+
+  // Populate chantier select
+  const chSel=document.getElementById('livraisonModalChantier');
+  chSel.innerHTML='<option value="">-- Aucun --</option>'+(state.chantiers||[]).map(c=>`<option value="${c.id}"${l&&l.chantierId===c.id?' selected':''}>${_esc(c.name||'')}</option>`).join('');
+
+  // Populate kunde select
+  const kSel=document.getElementById('livraisonModalKunde');
+  kSel.innerHTML='<option value="">-- Aucun --</option>'+(state.kunden||[]).map(k=>`<option value="${k.id}"${l&&l.kundeId===k.id?' selected':''}>${_esc(k.name||'')}</option>`).join('');
+
+  openModal('livraisonModal');
+}
+
+function saveLivraisonModal(){
+  try{
+    const name=document.getElementById('livraisonModalName').value.trim();
+    if(!name){alert('Le nom est obligatoire.');return;}
+    const id=document.getElementById('livraisonModalId').value||null;
+    const existing=id?(state.livraisons||[]).find(x=>x.id===id):null;
+    const data={
+      name,
+      chantierId:document.getElementById('livraisonModalChantier').value||null,
+      kundeId:document.getElementById('livraisonModalKunde').value||null,
+      date:document.getElementById('livraisonModalDate').value||null,
+      status:document.getElementById('livraisonModalStatus').value||'En attente',
+      reserves:existing?existing.reserves||[]:[],
+      updatedAt:Date.now()
+    };
+    const btn=document.querySelector('#livraisonModal .btn-confirm');
+    if(btn){btn.textContent='Enregistrement...';btn.disabled=true;}
+    _livraisonSave(data,id||undefined).then(()=>{
+      closeModal('livraisonModal');
+      if(btn){btn.textContent='Enregistrer';btn.disabled=false;}
+      showToast('Livraison enregistrée ✓');
+      if(state.currentView==='chantierHub') render();
+      else showLivraison();
+    }).catch(e=>{
+      if(btn){btn.textContent='Enregistrer';btn.disabled=false;}
+      alert('Erreur Firebase: '+e.message);
+    });
+  }catch(e){ alert('Erreur: '+e.message); }
+}
+
+function deleteLivraison(id){
+  if(!confirm('Supprimer cette livraison ? Cette action est irr\xe9versible.'))return;
+  _livraisonDelete(id).then(()=>showLivraison());
+}
+
+/* Helper: escape HTML */
+function _esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+
+/* ═══════════════════════════════════════════════
+   FULLSCREEN CHANTIER PICKER  (replaces old renderDashboard)
+═══════════════════════════════════════════════ */
+function showDashboard(){ state.currentView='dashboard'; render(); }
+
+function renderChantierPicker(){
+  var m=document.getElementById('mainContent');
+  if(!m)return;
+  var chantiers=state.chantiers||[];
+  var inner='<div class="picker-screen">';
+  inner+='<div class="picker-topbar">';
+  inner+='<div class="picker-title">&#127959; Mes Chantiers</div>';
+  inner+='<div style="display:flex;gap:.75rem;align-items:center;flex-wrap:wrap;">';
+  inner+='<div style="font-size:13px;color:var(--ink3)">'+chantiers.length+' chantier'+(chantiers.length!==1?'s':'')+'</div>';
+  inner+='<button class="btn-primary" onclick="openAddChantierModal()">+ Nouveau chantier</button>';
+  inner+='<button class="btn-secondary" onclick="showStats()" style="display:flex;align-items:center;gap:.4rem;">&#128202; Stats</button>';
+  var _openProbs=_getAllPins().filter(function(x){return x.pin.category!=='solved';}).length;
+  inner+='<button class="btn-secondary" onclick="showProblemsView()" style="display:flex;align-items:center;gap:.4rem;'+(_openProbs>0?'border-color:#e74c3c;color:#e74c3c;':'')+'">&#128205; Probl&#232;mes'+(_openProbs>0?' <span style="background:#e74c3c;color:#fff;border-radius:20px;padding:1px 7px;font-size:11px;font-weight:700;">'+_openProbs+'</span>':'')+'</button>';
+  inner+='</div></div>';
+  if(chantiers.length){
+    inner+='<div class="picker-grid">';
+    for(var i=0;i<chantiers.length;i++) inner+=_pickerCard(chantiers[i]);
+    inner+='</div>';
+  } else {
+    inner+='<div class="kunden-empty"><div class="kunden-empty-icon">&#127959;</div>';
+    inner+='<p style="font-size:16px;font-weight:600;margin-bottom:.5rem">Aucun chantier</p>';
+    inner+='<button class="btn-primary" onclick="openAddChantierModal()">+ Nouveau chantier</button></div>';
+  }
+  inner+='</div>';
+  m.innerHTML=inner;
+  // Attach click handlers via event delegation (more reliable than inline onclick)
+  var cards=m.querySelectorAll('[data-chantier-id]');
+  for(var ci=0;ci<cards.length;ci++){
+    (function(card){
+      card.addEventListener('click',function(e){
+        if(e.target.tagName==='BUTTON'||e.target.closest('button')) return;
+        showChantierHub(card.getAttribute('data-chantier-id'));
+      });
+    })(cards[ci]);
+  }
+}
+
+function _pickerCard(c){
+  const steps=(c.phases||[]).flatMap(ph=>ph.steps||[]);
+  const pct=steps.length?Math.round(steps.filter(s=>s.status==='done').length/steps.length*100):0;
+  const phases=(c.phases||[]).length;
+  const color=c.color||'var(--accent)';
+  const icon=c.icon||'&#127959;';
+  const kunde=(state.kunden||[]).find(k=>k.id===c.kundeId);
+  const livs=(state.livraisons||[]).filter(l=>l.chantierId===c.id);
+  const openRes=livs.reduce((a,l)=>a+(l.reserves||[]).filter(r=>!r.done).length,0);
+  const st=(c.phases||[]).flatMap(ph=>(ph.steps||[]).filter(s=>s.status!=='done')).length;
+  return `<div class="picker-card" data-chantier-id="${c.id}" style="cursor:pointer;transition:all .2s;position:relative;">
+    <div class="picker-card-accent" style="background:${color}"></div>
+    <button class="picker-card-del" onclick="event.stopPropagation();pickerDeleteChantier(${c.id})" title="Supprimer">&#10005;</button>
+    <div class="picker-card-body" onclick="showChantierHub(this.closest('[data-chantier-id]').dataset.chantierId)">
+      <div class="picker-card-top">
+        <div class="picker-card-icon" style="background:${color}22">${icon}</div>
+        ${c.status?`<span class="picker-card-status">${_esc(c.status)}</span>`:''}
+      </div>
+      <div class="picker-card-name">${_esc(c.name||'')}</div>
+      ${c.adresse?`<div class="picker-card-meta">&#128205; ${_esc(c.adresse)}</div>`:''}
+      ${kunde?`<div class="picker-card-meta">&#128101; ${_esc(kunde.name||'')}</div>`:''}
+      <div class="picker-card-prog">
+        <div class="picker-card-prog-label">
+          <span>Avancement</span><strong>${pct}%</strong>
+        </div>
+        <div class="picker-prog-bar"><div class="picker-prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="picker-card-footer">
+        <span class="picker-tag">&#128196; ${phases} phase${phases!==1?'s':''}</span>
+        ${st?`<span class="picker-tag" style="color:var(--accent2)">&#9209; ${st} t\xe2che${st!==1?'s':''} restantes</span>`:''}
+        ${openRes?`<span class="picker-tag" style="color:var(--red)">&#9888; ${openRes} r\xe9serve${openRes!==1?'s':''}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function showChantierHub(id){
+  state.currentView='chantierHub';
+  // IDs from data-chantier-id arrive as strings; Date.now() IDs are numbers
+  var _n=Number(id); state.currentChantierId=Number.isFinite(_n)?_n:id;
+  render();
+}
+
+function pickerDeleteChantier(id){
+  var _n=Number(id); var cid=Number.isFinite(_n)?_n:id;
+  var c=getChantier(cid); if(!c)return;
+  if(!confirm('Supprimer le chantier "'+c.name+'" et toutes ses données ?'))return;
+  state.chantiers=state.chantiers.filter(function(x){return x.id!==cid;});
+  if(state.currentChantierId===cid){state.currentChantierId=null;state.currentPhaseId=null;}
+  autoSave();
+  renderChantierPicker();
+  showToast('🗑 Chantier supprimé');
+}
+
+/* ═══════════════════════════════════════════════
+   CHANTIER HUB — Module tiles per chantier
+═══════════════════════════════════════════════ */
+// Helper: open client from hub (avoids stale window._hubKundeId)
+function _openHubClient(){
+  var c=getChantier(state.currentChantierId);
+  if(!c)return;
+  var kid=c.kundeId;
+  if(kid){
+    var k=(state.kunden||[]).find(function(x){return String(x.id)===String(kid);});
+    if(k){showKundenDetail(k.id);return;}
+  }
+  openKundeModal();
+}
+
+function renderChantierHub(id){
+  var m=document.getElementById('mainContent');
+  if(!m)return;
+  var c=null;
+  for(var i=0;i<(state.chantiers||[]).length;i++){
+    if(state.chantiers[i].id==id){c=state.chantiers[i];break;}  // loose == handles string/number mismatch
+  }
+  if(!c){showDashboard();return;}
+
+  var allSteps=[];
+  (c.phases||[]).forEach(function(ph){(ph.steps||[]).forEach(function(s){allSteps.push(s);});});
+  var stepsDone=allSteps.filter(function(s){return s.status==='done';}).length;
+  var pct=allSteps.length?Math.round(stepsDone/allSteps.length*100):0;
+
+  var kunde=null;
+  for(var ki=0;ki<(state.kunden||[]).length;ki++){
+    if(state.kunden[ki].id===c.kundeId){kunde=state.kunden[ki];break;}
+  }
+  window._hubKundeId=kunde?kunde.id:null;
+
+  var livs=(state.livraisons||[]).filter(function(l){return l.chantierId===id;});
+  var openRes=livs.reduce(function(a,l){return a+(l.reserves||[]).filter(function(r){return !r.done;}).length;},0);
+  // Count STs assigned to any step in this chantier, OR all STs if none assigned yet
+  var _stIds=new Set();
+  (c.phases||[]).forEach(function(ph){
+    (ph.steps||[]).forEach(function(s){(s.assignedSTs||[]).forEach(function(sid){_stIds.add(String(sid));});});
+    (ph.appartements||[]).forEach(function(apt){(apt.steps||[]).forEach(function(s){(s.assignedSTs||[]).forEach(function(sid){_stIds.add(String(sid));});});});
+  });
+  var stCount=_stIds.size>0?_stIds.size:(state.sousTraitants||[]).length;
+  var planCount=(state.plannings||[]).filter(function(p){return p.chantierId===id;}).length;
+  var docsCount=(c.docs||[]).length;
+  var phaseCount=(c.phases||[]).length;
+  var chanPins=_getAllPins().filter(function(x){return x.cid===id;});
+  var openPins=chanPins.filter(function(x){return x.pin.category!=='solved';}).length;
+
+  // All onclicks use state.currentChantierId (already set) or window._hubKundeId
+  // No IDs embedded in strings = no quoting issues
+  var html='<div style="min-height:calc(100vh - 68px);background:var(--paper);padding:2rem 2.5rem;">';
+
+  // Top bar
+  var _hidden=_hubGetHidden();
+  var _cust=_hubCustomizeMode;
+  html+='<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">';
+  html+='<button onclick="showDashboard()" style="background:#fff;border:1.5px solid var(--paper3);border-radius:10px;padding:9px 16px;font-size:13px;font-family:inherit;cursor:pointer;color:var(--ink2);">&#8592; Chantiers</button>';
+  html+='<div style="font-size:22px;font-weight:800;flex:1;min-width:0;">'+_esc(c.name||'')+'</div>';
+  html+='<button onclick="_hubCustomizeMode=!_hubCustomizeMode;renderChantierHub(state.currentChantierId)" style="background:'+(_cust?'var(--accent2)':'#fff')+';border:1.5px solid '+(_cust?'var(--accent2)':'var(--paper3)')+';color:'+(_cust?'#fff':'var(--ink2)')+';border-radius:10px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;">'+(_cust?'&#10003; Terminer':'&#128065; Personnaliser')+'</button>';
+  html+='<button onclick="showChantierView(state.currentChantierId)" style="background:var(--accent);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600;">&#128203; Ouvrir checklist</button>';
+  html+='</div>';
+
+  // Progress
+  html+='<div style="background:#fff;border:1px solid var(--paper3);border-radius:12px;padding:1rem 1.5rem;display:flex;align-items:center;gap:2rem;margin-bottom:2rem;flex-wrap:wrap;">';
+  html+='<div style="flex:1;min-width:200px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:12px;color:var(--ink3)">Avancement</span><strong>'+pct+'%</strong></div>';
+  html+='<div style="height:10px;background:var(--paper3);border-radius:5px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:5px;"></div></div></div>';
+  if(c.adresse) html+='<span style="font-size:13px;color:var(--ink3)">&#128205; '+_esc(c.adresse)+'</span>';
+  if(kunde) html+='<span style="font-size:13px;color:var(--ink3)">&#128101; '+_esc(kunde.name||'')+'</span>';
+  html+='<span style="font-size:13px;color:var(--ink3)">&#9989; '+stepsDone+'/'+allSteps.length+' t&acirc;ches</span>';
+  if(openRes>0) html+='<span style="font-size:13px;color:var(--red);font-weight:600">&#9888; '+openRes+' r&eacute;serve'+(openRes>1?'s':'')+'</span>';
+  html+='</div>';
+
+  // Tiles
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1.25rem;">';
+  var hov='onmouseover="this.style.transform=\'translateY(-3px)\';this.style.borderColor=\'var(--accent2)\';" onmouseout="this.style.transform=\'\';this.style.borderColor=\'var(--paper3)\';"';
+  var tBase='background:#fff;border:1.5px solid var(--paper3);border-radius:16px;padding:1.75rem 1.25rem;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.05);display:flex;flex-direction:column;align-items:center;text-align:center;gap:.5rem;position:relative;transition:all .2s;';
+
+  function mkTile(tileKey,icon2,name,val,meta,col,onclick2,badge){
+    var isHidden=_hidden.has(tileKey);
+    if(isHidden&&!_cust) return ''; // hidden and not in customize mode
+    var eyeBtn='';
+    if(_cust){
+      eyeBtn='<button onclick="event.stopPropagation();_hubToggleTile(\''+tileKey+'\')" title="'+(isHidden?'Afficher':'Masquer')+'" style="position:absolute;top:8px;left:8px;background:'+(isHidden?'#faeaea':'#f0f9f4')+';border:none;border-radius:20px;padding:3px 8px;font-size:12px;cursor:pointer;z-index:5;">'+(isHidden?'&#128065;&#x20E0;':'&#128065;')+'</button>';
+    }
+    var wrap='<div onclick="'+(isHidden?'':''+onclick2)+'" style="'+tBase+(isHidden?'opacity:.35;filter:grayscale(1);cursor:default;':'')+'" '+(!isHidden?hov:'')+'>'+eyeBtn;
+    if(badge&&!isHidden) wrap+='<span style="position:absolute;top:10px;right:10px;background:#faeaea;color:#8a1a1a;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;">'+badge+'</span>';
+    wrap+='<div style="width:54px;height:54px;border-radius:14px;background:'+col+';display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:2px;">'+icon2+'</div>';
+    if(val!==null&&val!=='') wrap+='<div style="font-size:26px;font-weight:800;color:var(--ink);line-height:1.1">'+val+'</div>';
+    wrap+='<div style="font-size:14px;font-weight:700;color:var(--ink)">'+name+'</div>';
+    wrap+='<div style="font-size:12px;color:var(--ink3)">'+meta+'</div>';
+    wrap+='</div>';
+    return wrap;
+  }
+
+  html+=mkTile('checklist','&#128203;','Checklist',pct+'%',stepsDone+'/'+allSteps.length+' t&acirc;ches','#e8f5ed','showChantierView(state.currentChantierId)',null);
+  html+=mkTile('soustraitants','&#128119;','Sous-traitants',stCount,stCount===1?'intervenant':'intervenants','#fff3e0','openSTManage()',null);
+  html+=mkTile('client','&#128106;','Client',kunde?'&#10003;':'&#8212;',kunde?_esc(kunde.name||''):'Non assign&eacute;','#ede8fe','_openHubClient()',null);
+  html+=mkTile('livraisons','&#127968;','Livraisons',livs.length,openRes>0?openRes+' r&eacute;serve'+(openRes>1?'s':'')+' ouverte'+(openRes>1?'s':''):'Tout OK','#fff8e0','showLivraison()',openRes>0?String(openRes):null);
+  html+=mkTile('documents','&#128196;','Documents',docsCount,docsCount===1?'fichier':'fichiers','#e8f0ff','state.currentView=\'documents\';render()',null);
+  html+=mkTile('planning','&#128197;','Planning',planCount,planCount===1?'planning':'plannings','#e8f8f0','showPlanning()',null);
+  html+=mkTile('reunions','&#128221;','R&eacute;unions',null,'Comptes rendus','#f5e8f5','openReunionPanelSidebar()',null);
+  html+=mkTile('photorapport','&#128247;','Photo / Rapport',null,'Rapport IA','#fff0f0','openPhotoRapport()',null);
+  html+=mkTile('problemes','&#128205;','Probl&egrave;mes',openPins,openPins===0?'Tout r&eacute;solu &#127881;':openPins+' ouvert'+(openPins>1?'s':''),'#fdecea','showProblemsView()',null);
+  var aptPhase=(c.phases||[]).find(function(p){return p.type==='apt'&&(p.appartements||[]).length>0;});
+  if(aptPhase) html+=mkTile('vuedensemble','&#128203;','Vue d\'ensemble',null,'Matrice des lots','#e8f4ff','state.currentView=\'overview\';state.currentChantierId='+id+';render()',null);
+  var dcCount=(c.docCodes||[]).length;
+  html+=mkTile('codes','&#128196;','Codes docs',dcCount||null,dcCount?dcCount+' code'+(dcCount>1?'s':''):('Codification WP'),'#f0f4ff','state.currentView=\'docCodes\';state.currentChantierId='+id+';render()',null);
+
+  html+='</div></div>';
+  m.innerHTML=html;
+}
+function showChantierView(id){
+  state.currentView='project';
+  var _n=Number(id); state.currentChantierId=Number.isFinite(_n)?_n:id;
+  // renderChecklist needs a valid phaseId — use first phase if none selected
+  var _ch=getChantier(state.currentChantierId);
+  if(_ch&&_ch.phases&&_ch.phases.length){
+    state.currentPhaseId=state.currentPhaseId&&getPhase(state.currentChantierId,state.currentPhaseId)?state.currentPhaseId:_ch.phases[0].id;
+  } else {
+    state.currentPhaseId=null;
+  }
+  render();
+}
+
+/* ═══════════════════════════════════════════════
+   DOC CODE GENERATOR — Wiesen-Piront Codification
+═══════════════════════════════════════════════ */
+function _dcVal(id){return (document.getElementById(id)||{}).value||'';}
+function _dcSet(id,v){var el=document.getElementById(id);if(el)el.value=v;}
+
+function _dcBuildCode(){
+  var chan=_dcVal('dcChan').toUpperCase();
+  var cad=_dcVal('dcCad')||'0';
+  var bat=_dcVal('dcBat').toUpperCase()||'0';
+  var etage=_dcVal('dcEtage');
+  var apt=_dcVal('dcApt').toUpperCase();
+  var corps=_dcVal('dcCorps');
+  var ent=_dcVal('dcEnt').toUpperCase();
+  var type=_dcVal('dcType');
+  var num=parseInt(_dcVal('dcNum')||'0');
+  var rev=_dcVal('dcRev');
+  // Validate required
+  var missing=[];
+  if(!chan) missing.push('Chantier');
+  if(!etage) missing.push('Étage');
+  if(!apt) missing.push('Appartement');
+  if(!corps) missing.push('Corps d\'état');
+  if(!ent) missing.push('Entreprise');
+  if(!type) missing.push('Type de document');
+  if(!num||num<1) missing.push('Numéro');
+  if(missing.length) return {code:null,missing};
+  // Format apt: if numeric, pad to 2 digits
+  var aptFmt=/^\d+$/.test(apt)?String(parseInt(apt)).padStart(2,'0'):apt;
+  var numFmt=String(num).padStart(2,'0');
+  var code=chan+cad+bat+etage+aptFmt+'_'+corps+'_'+ent+'_'+type+numFmt+rev;
+  return {code,missing:[]};
+}
+
+function _dcPreview(){
+  var r=_dcBuildCode();
+  var el=document.getElementById('dcPreview');
+  if(!el)return;
+  if(r.code){el.textContent=r.code;el.className='doccode-preview';}
+  else{el.textContent=r.missing.length?'Manquant: '+r.missing.join(', '):'— code —';el.className='doccode-preview invalid';}
+  var errEl=document.getElementById('dcErrors');
+  if(errEl){errEl.style.display='none';}
+}
+
+function _dcAutoNum(){
+  var cid=state.currentChantierId;
+  var ch=getChantier(cid);if(!ch)return;
+  var type=_dcVal('dcType');if(!type)return;
+  var corps=_dcVal('dcCorps');
+  var existing=(ch.docCodes||[]).filter(function(d){return d.type===type&&d.corps===corps&&!d.editingId;});
+  var maxNum=existing.reduce(function(mx,d){return Math.max(mx,d.num||0);},0);
+  _dcSet('dcNum',maxNum+1);
+  _dcPreview();
+}
+
+function _dcNewRevision(){
+  var cur=_dcVal('dcRev');
+  var next=cur===''?'A':String.fromCharCode(cur.charCodeAt(0)+1);
+  _dcSet('dcRev',next);
+  var display=document.getElementById('dcRevDisplay');
+  if(display) display.textContent='Révision '+next;
+  _dcPreview();
+}
+
+function openDocCodeModal(cid,existingId){
+  var ch=getChantier(cid);if(!ch)return;
+  // Auto-fill chantier from name
+  var chanAuto=ch.name.replace(/[^a-zA-Z0-9]/g,'').substring(0,4).toUpperCase();
+  _dcSet('dcId','');
+  _dcSet('dcChan',chanAuto);
+  _dcSet('dcCad','0');
+  _dcSet('dcBat','0');
+  _dcSet('dcEtage','');
+  _dcSet('dcApt','');
+  _dcSet('dcCorps','');
+  _dcSet('dcEnt','');
+  _dcSet('dcType','');
+  _dcSet('dcNum','1');
+  _dcSet('dcRev','');
+  var display=document.getElementById('dcRevDisplay');
+  if(display) display.textContent='1ère version — pas de suffixe';
+  var revBtn=document.getElementById('dcRevBtn');
+  if(revBtn) revBtn.style.display='none';
+  if(existingId){
+    // Edit existing
+    var doc=(ch.docCodes||[]).find(function(d){return d.id===existingId;});
+    if(doc){
+      _dcSet('dcId',doc.id);
+      _dcSet('dcChan',doc.chan||chanAuto);
+      _dcSet('dcCad',doc.cad||'0');
+      _dcSet('dcBat',doc.bat||'0');
+      _dcSet('dcEtage',doc.etage||'');
+      _dcSet('dcApt',doc.apt||'');
+      _dcSet('dcCorps',doc.corps||'');
+      _dcSet('dcEnt',doc.ent||'');
+      _dcSet('dcType',doc.type||'');
+      _dcSet('dcNum',doc.num||1);
+      _dcSet('dcRev',doc.rev||'');
+      var revLabel=doc.rev?'Révision '+doc.rev:'1ère version — pas de suffixe';
+      if(display) display.textContent=revLabel;
+      if(revBtn) revBtn.style.display='inline-flex';
+    }
+  }
+  var errEl=document.getElementById('dcErrors');
+  if(errEl) errEl.style.display='none';
+  _dcPreview();
+  openModal('docCodeModal');
+  setTimeout(function(){var el=document.getElementById('dcChan');if(el)el.focus();},100);
+}
+
+function saveDocCode(){
+  var r=_dcBuildCode();
+  if(!r.code){
+    var errEl=document.getElementById('dcErrors');
+    if(errEl){errEl.textContent='⚠ Champs obligatoires manquants : '+r.missing.join(', ');errEl.style.display='block';}
+    return;
+  }
+  var cid=state.currentChantierId;
+  var ch=getChantier(cid);if(!ch)return;
+  if(!ch.docCodes) ch.docCodes=[];
+  var editId=_dcVal('dcId');
+  var entry={
+    id:editId||String(Date.now()),
+    code:r.code,
+    chan:_dcVal('dcChan'),cad:_dcVal('dcCad'),bat:_dcVal('dcBat'),
+    etage:_dcVal('dcEtage'),apt:_dcVal('dcApt'),
+    corps:_dcVal('dcCorps'),ent:_dcVal('dcEnt'),
+    type:_dcVal('dcType'),num:parseInt(_dcVal('dcNum')),
+    rev:_dcVal('dcRev'),createdAt:Date.now()
+  };
+  if(editId){
+    var idx=ch.docCodes.findIndex(function(d){return d.id===editId;});
+    if(idx>=0)ch.docCodes[idx]=entry; else ch.docCodes.push(entry);
+  } else {
+    // Check duplicate code
+    var dup=ch.docCodes.find(function(d){return d.code===r.code;});
+    if(dup){
+      var errEl=document.getElementById('dcErrors');
+      if(errEl){errEl.textContent='⚠ Ce code existe déjà : '+r.code;errEl.style.display='block';}
+      return;
+    }
+    ch.docCodes.push(entry);
+  }
+  autoSave();
+  closeModal('docCodeModal');
+  showToast('📋 Code enregistré : '+r.code);
+  if(state.currentView==='docCodes') renderDocCodesView(cid);
+}
+
+function deleteDocCode(cid,docId){
+  var ch=getChantier(cid);if(!ch)return;
+  if(!confirm('Supprimer ce code document ?'))return;
+  ch.docCodes=(ch.docCodes||[]).filter(function(d){return d.id!==docId;});
+  autoSave();
+  renderDocCodesView(cid);
+  showToast('🗑 Code supprimé');
+}
+
+function openDocCodeRevision(cid,docId){
+  var ch=getChantier(cid);if(!ch)return;
+  var doc=(ch.docCodes||[]).find(function(d){return d.id===docId;});
+  if(!doc)return;
+  // Open modal with existing data + auto-advance revision
+  openDocCodeModal(cid,docId);
+  // Advance revision after modal opens
+  setTimeout(function(){
+    var cur=_dcVal('dcRev');
+    var next=cur===''?'A':String.fromCharCode(cur.charCodeAt(0)+1);
+    _dcSet('dcRev',next);
+    var display=document.getElementById('dcRevDisplay');
+    if(display) display.textContent='Nouvelle révision → '+next;
+    // Clear id so it creates a NEW entry
+    _dcSet('dcId','');
+    _dcPreview();
+  },50);
+}
+
+function renderDocCodesView(cid){
+  var m=document.getElementById('mainContent');
+  if(!m)return;
+  var ch=getChantier(cid);
+  if(!ch){m.innerHTML='';return;}
+  var docs=ch.docCodes||[];
+
+  // Group by type
+  var groups={};
+  docs.forEach(function(d){
+    var k=d.type||'—';
+    if(!groups[k])groups[k]=[];
+    groups[k].push(d);
+  });
+  var typeLabels={PLN:'Plan',DET:'Détail',NDC:'Note de Calcul',PLA:'Planning',NTC:'Note Technique',SCH:'Schéma',PPS:'PPSS',DEV:'Devis',LET:'Lettre',NOM:'Nomenclature',CRC:'Compte rendu',FPR:'Fiche Produit',LID:'Liste de Documents',CON:'Contrat',AVE:'Avenant'};
+  var corpsLabels={SS:'Terrassement/SS',BE:'Bureau d\'études',BC:'Bureau de contrôle',TER:'Terrassement',GO:'Gros œuvre',CC:'Couverture',ETA:'Étanchéité',ISO:'Isolation',MEXT:'Men. ext.',SER:'Serrurerie',PG:'Peinture gén.',ECH:'Échafaudage',FAC:'Façade',HVAC:'HVAC',ELEC:'Électricité',CF:'Cloisons/FC',PLA:'Plafonnage',CHA:'Chape',CAR:'Carrelage',PAR:'Parquet',MINT:'Men. int.',PCF:'Plafonds flot.',PEI:'Peinture',ASC:'Ascenseur',COM:'Domotique'};
+
+  var listHtml='';
+  if(!docs.length){
+    listHtml='<div class="kunden-empty"><div class="kunden-empty-icon">📋</div><p>Aucun code généré.</p><button class="btn-primary" onclick="openDocCodeModal('+cid+')">+ Nouveau code</button></div>';
+  } else {
+    Object.keys(groups).sort().forEach(function(type){
+      listHtml+='<div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin:.75rem 0 .4rem;padding-bottom:3px;border-bottom:1px solid var(--paper3);">'+(typeLabels[type]||type)+'</div>';
+      groups[type].forEach(function(d){
+        listHtml+='<div class="doccode-list-item">'
+          +'<div style="flex:1;min-width:0;">'
+          +'<div class="doccode-code">'+escHtml(d.code)+'</div>'
+          +'<div class="doccode-meta">'+(corpsLabels[d.corps]||d.corps||'')+(d.ent?' · '+escHtml(d.ent):'')+(d.rev?' · Rév. '+d.rev:' · 1ère version')+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:.4rem;flex-shrink:0;">'
+          +'<button onclick="openDocCodeRevision('+cid+',\''+d.id+'\')" title="Nouvelle révision" style="background:#e8f5ed;color:var(--accent);border:none;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;">📝 Rév.</button>'
+          +'<button onclick="openDocCodeModal('+cid+',\''+d.id+'\')" title="Modifier" style="background:var(--paper2);color:var(--ink2);border:none;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;">✏</button>'
+          +'<button onclick="deleteDocCode('+cid+',\''+d.id+'\')" title="Supprimer" style="background:#faeaea;color:#c0392b;border:none;border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer;font-family:inherit;">🗑</button>'
+          +'</div>'
+          +'</div>';
+      });
+    });
+  }
+
+  m.innerHTML='<div style="padding:1.5rem 2rem;max-width:900px;">'
+    +'<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">'
+    +'<button class="kunden-detail-back" onclick="showChantierHub('+cid+')">&#8592; '+escHtml(ch.name||'')+'</button>'
+    +'<div style="font-size:20px;font-weight:800;flex:1;">📋 Codes documents — '+escHtml(ch.name||'')+'</div>'
+    +'<button class="btn-primary" onclick="openDocCodeModal('+cid+')">+ Nouveau code</button>'
+    +'</div>'
+    +'<div style="background:#fff;border:1px solid var(--paper3);border-radius:12px;padding:1rem 1.25rem;margin-bottom:1rem;font-size:12px;color:var(--ink3);font-family:\'DM Mono\',monospace;">'
+    +'<strong style="color:var(--ink2)">Structure :</strong> [CHANTIER][CAD][BÂT][ÉTAGE][APT]_[CORPS]_[ENT]_[TYPE][N°][RÉV]<br>'
+    +'<strong style="color:var(--accent)">Exemple :</strong> BEL4A212_PLA_CAR_DEV01A — Belleg lot4 bât.A ét.2 apt12 · Plafonnage · Cardoso · Devis 01 Rév.A'
+    +'</div>'
+    +listHtml
+    +'</div>';
+}
+
+/* ═══════════════════════════════════════════════
+   HUB TILE VISIBILITY
+═══════════════════════════════════════════════ */
+var _hubCustomizeMode=false;
+function _hubGetHidden(){
+  try{var s=localStorage.getItem('hubHiddenTiles');return new Set(s?JSON.parse(s):[]);}catch(e){return new Set();}
+}
+function _hubSaveHidden(set){
+  try{localStorage.setItem('hubHiddenTiles',JSON.stringify([...set]));}catch(e){}
+}
+function _hubToggleTile(key){
+  var s=_hubGetHidden();
+  if(s.has(key))s.delete(key);else s.add(key);
+  _hubSaveHidden(s);
+  renderChantierHub(state.currentChantierId);
+}
+
+/* ═══════════════════════════════════════════════
+   VUE D'ENSEMBLE — Apartment Matrix Overview
+═══════════════════════════════════════════════ */
+var _ovFilter={etapes:new Set(),progress:'all',floor:'',problemsOnly:false};
+var _ovOpenDropdown=null;
+var _ovStepDropOpen=false;
+
+function _aptFloor(name){
+  var s=(name||'').trim();
+  var low=s.toLowerCase();
+  if(/^rdc/i.test(s)||/^0/.test(s)) return 'RDC';
+  var m=s.match(/^(\d+)/);
+  if(m) return '\xc9tage '+m[1];
+  if(/^(ss|sous.sol|b)/i.test(s)) return 'Sous-sol';
+  return 'Autre';
+}
+
+function _aptPins(apt){
+  return (apt.plans||[]).flatMap(function(p){return p.pins||[];}).filter(function(pin){return pin.category!=='solved';});
+}
+
+function renderOverviewView(cid){
+  var ch=getChantier(cid);
+  var m=document.getElementById('mainContent');
+  if(!ch||!m){if(m)m.innerHTML='';return;}
+
+  // Find apt phase(s) — could be multiple, we'll handle all
+  var aptPhases=(ch.phases||[]).filter(function(p){return p.type==='apt'&&(p.appartements||[]).length>0;});
+  if(!aptPhases.length){
+    m.innerHTML='<div style="padding:2rem"><button class="kunden-detail-back" onclick="showChantierHub('+cid+')">&#8592; Retour</button><div class="kunden-empty" style="margin-top:2rem"><div class="kunden-empty-icon">&#128203;</div><p>Aucun appartement pour cette vue.</p></div></div>';
+    return;
+  }
+
+  // Collect all apts across apt phases
+  var allApts=[];
+  aptPhases.forEach(function(ph){
+    (ph.appartements||[]).forEach(function(a){allApts.push({apt:a,ph:ph});});
+  });
+
+  // Step names — from first apt
+  var stepNames=(allApts[0].apt.steps||[]).map(function(s,i){return {i:i,name:s.name};});
+
+  // Floor list for filter
+  var floors=[...new Set(allApts.map(function(x){return _aptFloor(x.apt.name);}))];
+
+  // Apply filters
+  var f=_ovFilter;
+  var shown=allApts.filter(function(x){
+    var a=x.apt;
+    if(f.floor&&_aptFloor(a.name)!==f.floor) return false;
+    var pins=_aptPins(a);
+    if(f.problemsOnly&&pins.length===0) return false;
+    if(f.progress!=='all'){
+      var done=a.steps.filter(function(s){return s.done;}).length;
+      var total=a.steps.length;
+      var pct=total?done/total:0;
+      if(f.progress==='done'&&pct<1) return false;
+      if(f.progress==='inprogress'&&(pct===0||pct===1)) return false;
+      if(f.progress==='notstarted'&&pct>0) return false;
+    }
+    return true;
+  });
+
+  // Group by floor
+  var grouped={};
+  var floorOrder=[];
+  shown.forEach(function(x){
+    var fl=_aptFloor(x.apt.name);
+    if(!grouped[fl]){grouped[fl]=[];floorOrder.push(fl);}
+    grouped[fl].push(x);
+  });
+
+  // Focus columns (multi-select)
+  var focusSet=f.etapes; // Set of indices
+  var hasFocus=focusSet.size>0;
+
+  // Build column headers (abbreviated)
+  var abbrev=function(s){return s.length>14?s.substring(0,13)+'…':s;};
+
+  // Step filter — custom multi-select dropdown
+  var selCount=focusSet.size;
+  var stepDropLabel=selCount===0?'Toutes les \xe9tapes':selCount+' \xe9tape'+(selCount>1?'s':'');
+  var stepDropBtn='<div style="position:relative;display:inline-block;">'
+    +'<button onclick="_ovStepDropOpen=!_ovStepDropOpen;renderOverviewView('+cid+')" style="border:1.5px solid '+(selCount>0?'var(--accent)':'var(--paper3)')+';border-radius:8px;padding:5px 10px;font-size:12px;font-family:inherit;background:'+(selCount>0?'var(--accent)':'#fff')+';color:'+(selCount>0?'#fff':'var(--ink)')+';cursor:pointer;white-space:nowrap;">'+stepDropLabel+' &#9660;</button>';
+  if(_ovStepDropOpen){
+    stepDropBtn+='<div style="position:absolute;top:32px;left:0;z-index:100;background:#fff;border:1.5px solid var(--paper3);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.13);min-width:220px;max-height:280px;overflow-y:auto;padding:6px 0;">'
+      +'<div style="padding:6px 12px;border-bottom:1px solid var(--paper3);display:flex;justify-content:space-between;">'
+      +'<span style="font-size:11px;font-weight:700;color:var(--ink3)">FILTRER PAR \xc9TAPE</span>'
+      +'<button onclick="event.stopPropagation();_ovFilter.etapes=new Set();_ovStepDropOpen=false;renderOverviewView('+cid+')" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:inherit;">Tout effacer</button>'
+      +'</div>';
+    stepNames.forEach(function(sn){
+      var checked=focusSet.has(sn.i);
+      stepDropBtn+='<label style="display:flex;align-items:center;gap:8px;padding:7px 12px;cursor:pointer;font-size:12px;color:var(--ink);'+(checked?'background:#f0f9f4;':'')+'white-space:nowrap;" onclick="event.stopPropagation();">'
+        +'<input type="checkbox" '+(checked?'checked':'')+' onchange="_ovToggleEtape('+sn.i+')" style="cursor:pointer;accent-color:var(--accent);">'
+        +escHtml(sn.name)
+        +'</label>';
+    });
+    stepDropBtn+='</div>';
+  }
+  stepDropBtn+='</div>';
+  var floorOpts='<option value="">Tous les niveaux</option>'+floors.map(function(fl){
+    return '<option value="'+escHtml(fl)+'"'+(f.floor===fl?' selected':'')+'>'+escHtml(fl)+'</option>';
+  }).join('');
+
+  // Build table rows
+  var rowsHtml='';
+  floorOrder.forEach(function(fl){
+    rowsHtml+='<tr><td colspan="'+(stepNames.length+2)+'" style="background:var(--paper2);font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;padding:6px 12px;position:sticky;left:0;">'+escHtml(fl)+'</td></tr>';
+    grouped[fl].forEach(function(x){
+      var a=x.apt;
+      var pins=_aptPins(a);
+      var openPinCount=pins.length;
+      var rowHtml='<tr>';
+      // Apt name cell (sticky)
+      var kunde=a.kundeId?(state.kunden||[]).find(function(k){return String(k.id)===String(a.kundeId);}):null;
+      rowHtml+='<td style="position:sticky;left:0;z-index:2;background:#fff;border-right:2px solid var(--paper3);min-width:130px;max-width:160px;padding:8px 10px;cursor:pointer;" onclick="_currentAptId=\''+a.id+'\';state.currentView=\'project\';state.currentChantierId='+cid+';state.currentPhaseId=\''+x.ph.id+'\';render()">';
+      rowHtml+='<div style="font-weight:700;font-size:13px;color:var(--ink)">&#127968; '+escHtml(a.name)+'</div>';
+      if(kunde) rowHtml+='<div style="font-size:11px;color:var(--accent);font-weight:600">&#128100; '+escHtml(kunde.name||'')+'</div>';
+      rowHtml+='</td>';
+      // Step cells
+      stepNames.forEach(function(sn){
+        var s=a.steps[sn.i];
+        if(!s){rowHtml+='<td style="background:#f0f0f0;"></td>';return;}
+        var isDone=s.done;
+        var isInProg=s.inprogress||s.startedAt;
+        var allPreqDone=!s.prereqs||s.prereqs.length===0||s.checked&&s.checked.every(function(v){return v;});
+        var focused=focusSet.has(sn.i);
+        var bg,title;
+        if(isDone){bg='#27ae60';title='Termin\xe9';}
+        else if(isInProg){bg='#f39c12';title='En cours';}
+        else if(allPreqDone){bg='#3498db';title='Peut d\xe9marrer';}
+        else{bg='#e74c3c';title='Bloqu\xe9';}
+        if(!isDone&&!isInProg&&!allPreqDone&&s.prereqs&&s.prereqs.length===0){bg='#aaa';title='Non commenc\xe9';}
+        var opacity=focused?'1':hasFocus?'0.15':'1';
+        var border=focused?'2px solid var(--ink)':'1px solid rgba(255,255,255,.3)';
+        rowHtml+='<td style="padding:3px;text-align:center;" title="'+escHtml(sn.name)+' — '+escHtml(title)+'">';
+        rowHtml+='<div style="width:28px;height:28px;border-radius:6px;background:'+bg+';margin:auto;opacity:'+opacity+';border:'+border+';"></div>';
+        rowHtml+='</td>';
+      });
+      // Problems badge cell
+      var probCell='<td style="position:sticky;right:0;z-index:2;background:#fff;border-left:2px solid var(--paper3);text-align:center;padding:4px 8px;">';
+      if(openPinCount>0){
+        probCell+='<div style="position:relative;display:inline-block">';
+        probCell+='<button onclick="event.stopPropagation();_ovToggleProblems(\''+a.id+'\')" style="background:#faeaea;color:#c0392b;border:none;border-radius:20px;padding:3px 10px;font-size:12px;font-weight:700;cursor:pointer;">&#9888; '+openPinCount+'</button>';
+        if(_ovOpenDropdown===a.id){
+          probCell+='<div style="position:absolute;right:0;top:28px;z-index:50;background:#fff;border:1.5px solid var(--paper3);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);min-width:220px;max-width:280px;padding:8px 0;">';
+          pins.forEach(function(pin){
+            var cat={problem:'🔴',todo:'🟡',info:'🔵',solved:'✅'}[pin.category]||'📍';
+            probCell+='<div style="padding:6px 12px;font-size:12px;border-bottom:1px solid var(--paper3);color:var(--ink)">'+cat+' '+escHtml(pin.title||'')+'</div>';
+          });
+          probCell+='</div>';
+        }
+        probCell+='</div>';
+      } else {
+        probCell+='<span style="font-size:11px;color:var(--ink3)">&#10003;</span>';
+      }
+      probCell+='</td>';
+      rowHtml+=probCell+'</tr>';
+      rowsHtml+=rowHtml;
+    });
+  });
+
+  // Column headers
+  var colHeaders='<th style="position:sticky;left:0;z-index:3;background:var(--paper2);min-width:130px;padding:8px 10px;text-align:left;font-size:12px;border-right:2px solid var(--paper3);">Appartement</th>';
+  stepNames.forEach(function(sn){
+    var focused=focusSet.has(sn.i);
+    colHeaders+='<th style="min-width:36px;max-width:44px;padding:4px 2px;text-align:center;font-size:10px;font-weight:600;color:'+(focused?'var(--accent)':'var(--ink3)')+';writing-mode:vertical-rl;transform:rotate(180deg);height:90px;vertical-align:bottom;white-space:nowrap;cursor:pointer;background:'+(focused?'#e8f9ef':'var(--paper2)')+';" title="'+escHtml(sn.name)+'" onclick="_ovFocusStep('+sn.i+')">'+escHtml(abbrev(sn.name))+'</th>';
+  });
+  colHeaders+='<th style="position:sticky;right:0;z-index:3;background:var(--paper2);padding:8px 6px;text-align:center;font-size:12px;border-left:2px solid var(--paper3);">&#128205;</th>';
+
+  // Legend
+  var legend='<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;align-items:center;font-size:12px;">';
+  [{c:'#27ae60',l:'Termin\xe9'},{c:'#f39c12',l:'En cours'},{c:'#3498db',l:'Peut d\xe9marrer'},{c:'#e74c3c',l:'Bloqu\xe9'}].forEach(function(x){
+    legend+='<span style="display:flex;align-items:center;gap:5px;"><span style="width:14px;height:14px;border-radius:3px;background:'+x.c+';display:inline-block;"></span>'+x.l+'</span>';
+  });
+  legend+='</div>';
+
+  m.innerHTML='<div style="padding:1.5rem 2rem;max-width:100%;overflow:hidden;">'
+    +'<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.25rem;flex-wrap:wrap;">'
+    +'<button class="kunden-detail-back" onclick="showChantierHub('+cid+')">&#8592; '+escHtml(ch.name||'')+'</button>'
+    +'<div style="font-size:20px;font-weight:800;flex:1">&#128203; Vue d\'ensemble &mdash; '+escHtml(ch.name||'')+'</div>'
+    +'</div>'
+    // Filter bar
+    +'<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:1rem;background:#fff;border:1px solid var(--paper3);border-radius:12px;padding:.75rem 1rem;">'
+    +stepDropBtn
+    +'<select onchange="_ovFilter.floor=this.value;render()" style="border:1.5px solid var(--paper3);border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;background:#fff;cursor:pointer;">'+floorOpts+'</select>'
+    +'<select onchange="_ovFilter.progress=this.value;render()" style="border:1.5px solid var(--paper3);border-radius:8px;padding:5px 8px;font-size:12px;font-family:inherit;background:#fff;cursor:pointer;">'
+    +'<option value="all"'+(f.progress==='all'?' selected':'')+'>Tous avancements</option>'
+    +'<option value="done"'+(f.progress==='done'?' selected':'')+'>&#9989; Termin\xe9</option>'
+    +'<option value="inprogress"'+(f.progress==='inprogress'?' selected':'')+'>&#9654; En cours</option>'
+    +'<option value="notstarted"'+(f.progress==='notstarted'?' selected':'')+'>Non commenc\xe9</option>'
+    +'</select>'
+    +'<label style="display:flex;align-items:center;gap:.4rem;font-size:12px;cursor:pointer;white-space:nowrap;">'
+    +'<input type="checkbox" '+(f.problemsOnly?'checked':'')+' onchange="_ovFilter.problemsOnly=this.checked;render()" style="cursor:pointer;">'
+    +'&#9888; Probl\xe8mes uniquement</label>'
+    +'<span style="font-size:12px;color:var(--ink3);margin-left:auto;">'+shown.length+' lot'+(shown.length!==1?'s':'')+' affich\xe9'+(shown.length!==1?'s':'')+'</span>'
+    +'</div>'
+    +legend
+    +'<div style="overflow-x:auto;border:1px solid var(--paper3);border-radius:12px;background:#fff;">'
+    +'<table style="border-collapse:collapse;width:100%;table-layout:auto;">'
+    +'<thead><tr>'+colHeaders+'</tr></thead>'
+    +'<tbody>'+rowsHtml+'</tbody>'
+    +'</table>'
+    +'</div>'
+    +'</div>';
+}
+
+function _ovFocusStep(idx){
+  // Click column header: toggle that step in the set
+  if(_ovFilter.etapes.has(idx)) _ovFilter.etapes.delete(idx);
+  else _ovFilter.etapes.add(idx);
+  render();
+}
+function _ovToggleEtape(idx){
+  if(_ovFilter.etapes.has(idx)) _ovFilter.etapes.delete(idx);
+  else _ovFilter.etapes.add(idx);
+  renderOverviewView(state.currentChantierId);
+}
+function _ovToggleProblems(aptId){
+  _ovOpenDropdown=_ovOpenDropdown===aptId?null:aptId;
+  renderOverviewView(state.currentChantierId);
+}
+
+// Close étape dropdown when clicking outside
+document.addEventListener('click',function(e){
+  if(_ovStepDropOpen&&!e.target.closest('[data-ov-drop]')){
+    var btn=e.target.closest('button');
+    if(btn&&btn.textContent&&(btn.textContent.includes('étape')||btn.textContent.includes('▾'))) return;
+    _ovStepDropOpen=false;
+    if(state.currentView==='overview') renderOverviewView(state.currentChantierId);
+  }
+});
+
 </script>
 
 <!-- ═══ EMAIL MODAL ═══ -->
