@@ -2370,7 +2370,7 @@ function renderChecklist(cid,pid){
 //  ACTIONS
 // ════════════════════════════════════════
 function showDashboard(){ state.currentView='dashboard'; state.currentChantierId=null; state.currentPhaseId=null; _filter='all'; render(); }
-function showProject(cid,pid){ const changing=state.currentChantierId!==cid||state.currentPhaseId!==pid; state.currentView='project'; state.currentChantierId=cid; state.currentPhaseId=pid; _filter='all'; if(changing){_currentAptId=null;_showImmeubleTotal=false;} const c=getChantier(cid); if(c) c.expanded=true; render(); }
+function showProject(cid,pid){ const changing=state.currentChantierId!==cid||state.currentPhaseId!==pid; state.currentView='project'; state.currentChantierId=cid; state.currentPhaseId=pid; _filter='all'; if(changing){_currentAptId=null;_showImmeubleTotal=false;_aptSearch='';} const c=getChantier(cid); if(c) c.expanded=true; render(); }
 function toggleChantier(cid){ const c=getChantier(cid); if(c){ c.expanded=!c.expanded; renderSidebar(); } }
 function setFilter(f,cid,pid){ _filter=f; renderChecklist(cid,pid); }
 
@@ -2500,6 +2500,7 @@ let _currentAptId=null; // null = show apt grid, string = show apt detail
 let _aptSelectMode=false;
 let _showImmeubleTotal=false;
 let _selectedApts=new Set(); // selected apt IDs (strings)
+let _aptSearch=''; // search filter for apt grid
 
 function _generateAptNames(baseName, count){
   // Find trailing number (with possible zero-padding)
@@ -2750,19 +2751,23 @@ function renderAptSection(cid,pid){
   // Grid view
   const selCount=_selectedApts.size;
 
+  // Apply search filter
+  const _sq=_aptSearch.trim().toLowerCase();
+  const visibleApts=_sq?apts.filter(a=>(a.name||'').toLowerCase().includes(_sq)):apts;
+
   // Global progress for Immeuble total card
   let totalDone=0,totalSteps=0;
   apts.forEach(a=>{totalDone+=a.steps.filter(s=>s.done).length;totalSteps+=a.steps.length;});
   const globalPct=totalSteps?Math.round(totalDone/totalSteps*100):0;
 
-  const immeubleCard=apts.length>0&&!_aptSelectMode?`
+  const immeubleCard=apts.length>0&&!_aptSelectMode&&!_sq?`
     <div class="apt-card" style="border:2px solid var(--accent);background:linear-gradient(135deg,#f0f4ff,#e8ecf8)" onclick="_showImmeubleTotal=true;showProject(${cid},${pid})">
       <div class="apt-card-name" style="color:var(--accent)">🏢 Immeuble total</div>
       <div class="apt-card-prog"><div class="apt-card-prog-fill" style="width:${globalPct}%;background:var(--accent)"></div></div>
       <div class="apt-card-meta" style="color:var(--accent2)">${totalDone}/${totalSteps} étapes · ${globalPct}% · ${apts.length} appt${apts.length>1?'s':''}</div>
     </div>`:'';
 
-  const cards=apts.map(apt=>{
+  const cards=visibleApts.map(apt=>{
     const p=getAptProgress(apt);
     const isSel=_selectedApts.has(apt.id);
     if(_aptSelectMode){
@@ -2800,13 +2805,23 @@ function renderAptSection(cid,pid){
       <button class="apt-add-btn" onclick="openAddAptModal(${cid},${pid})">＋ Ajouter</button>
     </div>`:`<button class="apt-add-btn" onclick="openAddAptModal(${cid},${pid})">＋ Ajouter un appartement</button>`;
 
+  const searchBar=apts.length>0?`
+    <div style="margin-bottom:10px">
+      <input type="text" value="${escHtml(_aptSearch)}" oninput="_aptSearch=this.value;renderChecklist(${cid},${pid})" placeholder="🔍 Rechercher un appartement…" style="width:100%;box-sizing:border-box;padding:8px 12px;border:1.5px solid var(--paper3);border-radius:9px;font-size:13px;font-family:inherit;outline:none;background:#fafafa;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--paper3)'">
+    </div>`:'';
+
+  const emptyMsg=_sq
+    ?`<div style="font-size:13px;color:var(--ink3);padding:10px 0">Aucun appartement correspond à "<strong>${escHtml(_sq)}</strong>"</div>`
+    :`<div style="font-size:13px;color:var(--ink3);padding:10px 0">Aucun appartement — cliquez sur "＋ Ajouter" pour commencer</div>`;
+
   return `<div class="apt-section">
     <div class="apt-section-header">
-      <div class="apt-section-title">🏠 Appartements (${apts.length})</div>
+      <div class="apt-section-title">🏠 Appartements (${_sq?visibleApts.length+'/'+apts.length:apts.length})</div>
       ${headerBtns}
     </div>
     ${bulkBar}
-    ${apts.length===0?`<div style="font-size:13px;color:var(--ink3);padding:10px 0">Aucun appartement — cliquez sur "＋ Ajouter" pour commencer</div>`:`<div class="apt-grid">${immeubleCard}${cards}</div>`}
+    ${searchBar}
+    ${apts.length===0?emptyMsg:`<div class="apt-grid">${immeubleCard}${cards}</div>`}
   </div>`;
 }
 
