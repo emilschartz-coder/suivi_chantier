@@ -4722,10 +4722,11 @@ async function saveSTAccount(){
       if(!password||password.length<6){showToast('⚠ Mot de passe: min. 6 caractères');btn.disabled=false;btn.textContent='Créer le compte';return;}
       showToast('⏳ Création du compte…');
       const workerUid=await window._fbCreateWorkerAccount(email,password);
-      // Register under admin's workers path (same as regular workers) + workerMap for login detection
+      // Register under admin's workers path
       const workerEntry={adminUid:_uid,name:st.name,email,allowedChantiers:[],isSousTraitant:true,stId,createdAt:Date.now()};
       await window._fbSet(_adminWorkersPath()+'/'+workerUid,workerEntry);
-      await window._fbSet('workerMap/'+workerUid,workerEntry);
+      // workerMap write is best-effort — don't block if it fails
+      window._fbSet('workerMap/'+workerUid,workerEntry).catch(e=>console.warn('workerMap write failed (non-critical):',e.message));
       // Save UID to sous-traitant record
       const idx=state.sousTraitants.findIndex(s=>s.id===stId);
       if(idx>=0){state.sousTraitants[idx]={...state.sousTraitants[idx],uid:workerUid};}
@@ -4746,7 +4747,7 @@ async function saveSTAccount(){
     await refreshTeamList();
   }catch(e){
     console.error(e);
-    const msg=e.code==='auth/email-already-in-use'?'Cet e-mail est déjà utilisé.':e.code==='auth/invalid-email'?'E-mail invalide.':(e.message||'Erreur');
+    const msg=e.code==='auth/email-already-in-use'?'Cet e-mail est déjà utilisé — essayez avec un autre e-mail.':e.code==='auth/invalid-email'?'E-mail invalide.':e.code==='auth/operation-not-allowed'?'Connexion e-mail non activée dans Firebase.':e.code==='auth/weak-password'?'Mot de passe trop faible (min. 6 caractères).':(e.message||'Erreur inconnue — vérifiez la console');
     showToast('⚠ '+msg);
     btn.disabled=false;
     btn.textContent=st.uid?'Enregistrer':'Créer le compte';
