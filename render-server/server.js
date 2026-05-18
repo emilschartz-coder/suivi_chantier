@@ -115,6 +115,71 @@ app.post('/send-problem', async (req, res) => {
   }
 });
 
+// ── POST /send-resolved ───────────────────────────────────────────────────────
+// Body: { to, title, note, resolvedBy, resolveNote, resolvePhoto?, originalPhoto?, chantierName, planName, resolvedAt }
+app.post('/send-resolved', async (req, res) => {
+  const { to, title, note, resolvedBy, resolveNote, resolvePhoto, originalPhoto, chantierName, planName, resolvedAt } = req.body;
+  if (!to || !title) return res.status(400).json({ error: 'to, title requis' });
+
+  const dateStr = resolvedAt
+    ? new Date(resolvedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    : new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const resolvePhotoHtml = resolvePhoto
+    ? `<div style="margin:12px 0"><p style="font-size:12px;color:#888;margin:0 0 6px">Photo de la réparation :</p><img src="${resolvePhoto}" style="max-width:100%;border-radius:8px;border:1px solid #e0e0e0"></div>`
+    : '';
+  const originalPhotoHtml = originalPhoto
+    ? `<div style="margin:12px 0"><p style="font-size:12px;color:#888;margin:0 0 6px">Photo originale du problème :</p><img src="${originalPhoto}" style="max-width:100%;border-radius:8px;border:1px solid #e0e0e0;opacity:.7"></div>`
+    : '';
+
+  const html = `
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.08)">
+        <tr><td style="background:#1a7a4a;padding:24px 32px">
+          <div style="font-size:22px;font-weight:700;color:#fff">✅ Problème résolu</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.85);margin-top:4px">${escHtmlNode(chantierName)} ${planName ? '· ' + escHtmlNode(planName) : ''}</div>
+        </td></tr>
+        <tr><td style="padding:28px 32px">
+          <div style="background:#f0faf4;border:1.5px solid #b7e4c7;border-left:4px solid #1a7a4a;border-radius:8px;padding:16px 20px;margin-bottom:20px">
+            <div style="font-size:17px;font-weight:700;color:#1a1a1a;margin-bottom:6px">${escHtmlNode(title)}</div>
+            ${note ? `<div style="font-size:13px;color:#666;margin-bottom:8px">${escHtmlNode(note)}</div>` : ''}
+            <div style="font-size:13px;color:#1a7a4a;font-weight:600">Résolu par : ${escHtmlNode(resolvedBy)}</div>
+            ${resolveNote ? `<div style="font-size:13px;color:#555;margin-top:6px">${escHtmlNode(resolveNote)}</div>` : ''}
+          </div>
+          ${resolvePhotoHtml}${originalPhotoHtml}
+          <table cellpadding="0" cellspacing="0" style="width:100%;font-size:12px;color:#888;margin-top:8px">
+            ${chantierName ? `<tr><td style="padding:3px 0;width:90px">Chantier</td><td style="color:#333;font-weight:600">${escHtmlNode(chantierName)}</td></tr>` : ''}
+            ${planName    ? `<tr><td style="padding:3px 0">Plan</td><td style="color:#333">${escHtmlNode(planName)}</td></tr>` : ''}
+            <tr><td style="padding:3px 0">Résolu le</td><td style="color:#333">${dateStr}</td></tr>
+          </table>
+          <p style="margin:24px 0 0;font-size:12px;color:#aaa">Email automatique ChantierPro.</p>
+        </td></tr>
+        <tr><td style="background:#f9f9f9;padding:16px 32px;border-top:1px solid #eee">
+          <div style="font-size:11px;color:#bbb;text-align:center">ChantierPro · Gestion de chantiers</div>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body></html>`;
+
+  try {
+    const data = await resend.emails.send({
+      from   : `${FROM_NAME} <${FROM_EMAIL}>`,
+      to     : [to],
+      subject: `✅ Résolu — ${chantierName || 'Chantier'} : ${title}`,
+      html,
+    });
+    console.log(`[send-resolved] OK → ${to} | id=${data.id}`);
+    res.json({ ok: true, id: data.id });
+  } catch (err) {
+    console.error('[send-resolved] ERROR', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── POST /send-custom ─────────────────────────────────────────────────────────
 // Body: { to, subject, html }  — for future use (daily digest, etc.)
 app.post('/send-custom', async (req, res) => {

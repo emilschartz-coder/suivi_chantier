@@ -1861,9 +1861,11 @@ async function doLogin(){
 }
 async function doLogout(){ await window._fbSignOut(); }
 function showLoginScreen(){ document.getElementById('loginScreen').style.display='flex'; document.getElementById('loginBtn').disabled=false; document.getElementById('loginBtn').textContent='Se connecter'; document.getElementById('loginError').textContent=''; document.getElementById('loginPassword').value=''; setTimeout(()=>document.getElementById('loginEmail').focus(),100); }
+let _adminEmail=null; // admin email for resolve notifications
 function hideLoginScreen(user){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('userBadge').textContent=_isWorker?('👤 '+_workerName):user.email;
+  if(!_isWorker) _adminEmail=user.email||null;
   const adminBtns=document.getElementById('adminHeaderBtns');
   if(adminBtns) adminBtns.style.display=_isWorker?'none':'contents';
 }
@@ -4156,6 +4158,32 @@ async function _sendProblemNotification(pin, st, chantierName, planName){
 }
 // ───────────────────────────────────────────────────────────────────────────
 
+async function _sendResolvedNotification(data, adminEmail){
+  const apiUrl=(state.profile&&state.profile.renderApiUrl)||'';
+  if(!apiUrl||!adminEmail) return;
+  try{
+    const resp=await fetch(apiUrl+'/send-resolved',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        to:adminEmail,
+        title:data.title||'',
+        note:data.note||'',
+        resolvedBy:data.resolvedBy||'',
+        resolveNote:data.resolveNote||'',
+        resolvePhoto:data.resolvePhoto||null,
+        originalPhoto:data.originalPhoto||null,
+        chantierName:data.chantierName||'',
+        planName:data.planName||'',
+        resolvedAt:data.resolvedAt||new Date().toISOString()
+      })
+    });
+    const d=await resp.json();
+    if(d.ok) showToast('📧 Notification envoyée');
+    else console.warn('[mailer] send-resolved:',d.error);
+  }catch(e){ console.warn('[mailer] resolved fetch error:',e.message); }
+}
+
 function openResolvePinModal(cid,planIdx,pinId){
   _resolvingPin={cid,planIdx,pinId,aptMode:_annAptMode};
   document.getElementById('pinResolveNameInput').value='';
@@ -4187,6 +4215,23 @@ function confirmResolvePin(){
   _updateProbMeta();
   renderProblemsViewIfActive();
   showToast('✅ Résolu par '+name);
+  // Notify admin by email
+  const _notifAdminEmail=_adminEmail||(state.profile&&state.profile.notifEmail)||null;
+  if(_notifAdminEmail){
+    const _notifChantier=getChantier(cid);
+    const _notifPlan=_resolvingPin?.aptMode?_viewerPlan:_notifChantier?.plans?.[planIdx];
+    _sendResolvedNotification({
+      title:pin.title||'',
+      note:pin.note||'',
+      resolvedBy:name,
+      resolveNote:note,
+      resolvePhoto:(pin.resolvePhoto&&pin.resolvePhoto.length<500000)?pin.resolvePhoto:null,
+      originalPhoto:(pin.photo&&pin.photo.length<500000)?pin.photo:null,
+      chantierName:_notifChantier?.name||'',
+      planName:_notifPlan?.name||'',
+      resolvedAt:pin.resolvedAt
+    },_notifAdminEmail);
+  }
 }
 
 function _updateProbMeta(){
