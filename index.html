@@ -1,4 +1,5 @@
 <html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<script src="https://js-de.sentry-cdn.com/c0d85f0c1c68ff2352ef23ed72a849a1.min.js" crossorigin="anonymous"></script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -986,6 +987,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   window.addEventListener('online', ()=>_applyNetworkState(true));
   window.addEventListener('offline',()=>_applyNetworkState(false));
   if(!navigator.onLine) setTimeout(()=>_applyNetworkState(false),1000);
+  // ── SENTRY ERROR MONITORING ──
+  if(window.Sentry){
+    Sentry.onLoad(function(){
+      Sentry.init({
+        dsn:"https://c0d85f0c1c68ff2352ef23ed72a849a1@o4511416367054848.ingest.de.sentry.io/4511416405327952",
+        environment:"production",
+        release:"chantierpro-wp@1.0",
+        beforeSend(event){
+          if(event.exception&&event.exception.values){
+            const msg=event.exception.values[0]?.value||'';
+            if(msg.includes('blocked')||msg.includes('adblock')) return null;
+          }
+          return event;
+        }
+      });
+    });
+  }
+
   window._fbSignIn=(e,p)=>signInWithEmailAndPassword(auth,e,p);
   window._fbSignOut=()=>signOut(auth);
   window._fbOnAuth=(cb)=>onAuthStateChanged(auth,cb);
@@ -1814,6 +1833,7 @@ const TEMPLATES = {
 const SITE_ALLOWED_EMAILS = [
   'emilschartz@gmail.com',
   'contact@chantierpro.eu',
+  'm.leonardi@wiesenpiront.lu',
   'm.leonardi@wiesenpiront.lu',
 ];
 // LEER LASSEN = alle Firebase-User dürfen rein
@@ -5857,6 +5877,7 @@ document.addEventListener('firebaseReady',()=>{
         _adminUid=_uid;
         _allowedChantiers=[];
         _workerName='';
+        if(window.Sentry) Sentry.setUser({email:user.email,id:user.uid});
       }
       // cache session for offline login
       if(window._cSave) window._cSave('__session__',{uid:_uid,email:user.email,isWorker:_isWorker,adminUid:_adminUid,allowedChantiers:_allowedChantiers,workerName:_workerName});
