@@ -1,4 +1,4 @@
-const CACHE = 'wp-v3';
+const CACHE = 'wp-v4';
 const ASSETS = [
   '/',
   '/index.html',
