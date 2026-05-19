@@ -1,6 +1,5 @@
 <html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<!-- Sentry temporarily disabled for debug -->
-<!-- <script src="https://js-de.sentry-cdn.com/c0d85f0c1c68ff2352ef23ed72a849a1.min.js" crossorigin="anonymous"></script> -->
+<script src="https://js-de.sentry-cdn.com/c0d85f0c1c68ff2352ef23ed72a849a1.min.js" crossorigin="anonymous" defer></script>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -995,6 +994,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
         dsn:"https://c0d85f0c1c68ff2352ef23ed72a849a1@o4511416367054848.ingest.de.sentry.io/4511416405327952",
         environment:"production",
         release:"chantierpro-wp@1.0",
+        tracePropagationTargets:[],
+        integrations:[],
         beforeSend(event){
           if(event.exception&&event.exception.values){
             const msg=event.exception.values[0]?.value||'';
