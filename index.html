@@ -5855,7 +5855,7 @@ document.addEventListener('firebaseReady',()=>{
       _uid=user.uid;
       // Check if this user is a registered worker
       let workerData=null;
-      try{ workerData=await window._fbGet('workerMap/'+_uid); }catch(e){}
+      try{ workerData=await Promise.race([window._fbGet('workerMap/'+_uid),new Promise(r=>setTimeout(()=>r(null),5000))]); }catch(e){}
       if(workerData&&workerData.adminUid){
         // ── WORKER MODE ──
         _isWorker=true;
