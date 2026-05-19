@@ -1031,6 +1031,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <span class="user-badge" id="userBadge"></span>
     <div id="adminHeaderBtns" style="display:contents">
       <button class="header-btn" onclick="openProfileModal()" title="Profil entreprise">🏢 Profil</button>
+      <button class="header-btn" onclick="openBackupsModal()" title="Sauvegardes automatiques" style="border-color:rgba(26,107,58,.4);color:#6abf80">🗄 Backups</button>
       <button class="header-btn" id="installBtn" onclick="installApp()" style="display:none">📲 Installer</button>
       <button class="header-btn" onclick="openRapportModal()" style="background:rgba(122,182,72,.18);border-color:rgba(122,182,72,.4);color:#a8d878">📝 Rapport</button>
       <button class="header-btn" onclick="window.print()">🖨 Imprimer</button>
@@ -1530,6 +1531,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   </div>
 </div>
 
+<!-- Modal: Sauvegardes -->
+<div class="modal-overlay" id="backupsModal">
+  <div class="modal wide">
+    <h3>🗄 Sauvegardes automatiques</h3>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;">Un snapshot est créé automatiquement chaque jour. Les 10 dernières sauvegardes sont conservées.</p>
+    <div id="backupsList" style="max-height:360px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <div></div>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('backupsModal')">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Profil entreprise -->
 <div class="modal-overlay" id="profileModal">
   <div class="modal wide">
@@ -1971,6 +1987,85 @@ function pushToFirebase(){
   window._fbSet(getFbPath(),payload).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('offline'));
 }
 function autoSave(){ if(!_isSyncing) pushToFirebase(); }
+
+// ════════════════════════════════════════
+//  BACKUP SYSTEM
+// ════════════════════════════════════════
+function _backupFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/backups'; }
+
+async function autoBackupDaily(){
+  if(!window._fbGet||!window._fbSet||!_uid||_isWorker) return;
+  const today=new Date().toISOString().slice(0,10);
+  try{
+    const backups=await Promise.race([window._fbGet(_backupFbPath()),new Promise(r=>setTimeout(()=>r(null),8000))]);
+    const keys=Object.keys(backups||{});
+    if(keys.includes(today)) return; // already backed up today
+    const payload={
+      chantiers:JSON.parse(JSON.stringify(state.chantiers||[])),
+      sousTraitants:JSON.parse(JSON.stringify(state.sousTraitants||[])),
+      profile:{companyName:state.profile?.companyName||''},
+      savedAt:new Date().toISOString(),
+      chantierCount:(state.chantiers||[]).length
+    };
+    await window._fbSet(_backupFbPath()+'/'+today,payload);
+    // Keep only last 10
+    if(keys.length>=10){
+      const sorted=keys.sort();
+      for(const k of sorted.slice(0,keys.length-9)) window._fbSet(_backupFbPath()+'/'+k,null);
+    }
+    console.log('✅ Backup saved for '+today);
+  }catch(e){ console.warn('Backup failed:',e.message); }
+}
+
+async function openBackupsModal(){
+  const list=document.getElementById('backupsList');
+  list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:8px 0">Chargement…</div>';
+  document.getElementById('backupsModal').style.display='flex';
+  try{
+    const backups=await Promise.race([window._fbGet(_backupFbPath()),new Promise(r=>setTimeout(()=>r(null),8000))]);
+    if(!backups||Object.keys(backups).length===0){
+      list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:8px 0">Aucune sauvegarde disponible.<br><small>Le premier backup sera créé automatiquement demain.</small></div>';
+      return;
+    }
+    const keys=Object.keys(backups).sort().reverse();
+    list.innerHTML=keys.map(k=>{
+      const b=backups[k];
+      const n=(b.chantiers||[]).length;
+      const d=new Date(k+'T12:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      const saved=b.savedAt?new Date(b.savedAt).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}):'';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--paper2);border-radius:8px;margin-bottom:8px;">
+        <div>
+          <div style="font-weight:600;font-size:14px;">📅 ${d}</div>
+          <div style="font-size:12px;color:var(--ink3);margin-top:2px;">${n} chantier${n!==1?'s':''} · sauvegardé à ${saved}</div>
+        </div>
+        <button onclick="restoreBackup('${k}')" style="background:var(--accent);color:#fff;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0;margin-left:12px;">↩ Restaurer</button>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<div style="color:var(--red);font-size:13px;">Erreur de chargement.</div>';
+  }
+}
+
+async function restoreBackup(dateKey){
+  const d=new Date(dateKey+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
+  if(!confirm('Restaurer la sauvegarde du '+d+' ?\n\nLes données actuelles seront remplacées par celles de cette date.\nUne nouvelle sauvegarde de l\'état actuel sera créée avant la restauration.')) return;
+  try{
+    // Save current state as emergency backup before restoring
+    const emergencyKey=new Date().toISOString().replace(/[:.]/g,'-').slice(0,16);
+    const emergency={chantiers:JSON.parse(JSON.stringify(state.chantiers||[])),sousTraitants:JSON.parse(JSON.stringify(state.sousTraitants||[])),profile:{companyName:state.profile?.companyName||''},savedAt:new Date().toISOString(),chantierCount:(state.chantiers||[]).length};
+    await window._fbSet(_backupFbPath()+'/avant-restauration-'+emergencyKey,emergency);
+    // Restore
+    const backup=await window._fbGet(_backupFbPath()+'/'+dateKey);
+    if(!backup){showToast('⚠ Sauvegarde introuvable');return;}
+    state.chantiers=backup.chantiers||[];
+    state.sousTraitants=backup.sousTraitants||[];
+    state.profile={...(backup.profile||{}),logo:state.profile?.logo||null};
+    await pushToFirebase();
+    closeModal('backupsModal');
+    render();
+    showToast('✅ Données restaurées au '+d);
+  }catch(e){showToast('❌ Erreur lors de la restauration: '+e.message);}
+}
 
 function startFirebaseListener(){
   window._fbListen(getFbPath(),(data)=>{
@@ -5903,6 +5998,7 @@ document.addEventListener('firebaseReady',()=>{
       startFirebaseListener();
       _kundenLoad();
       _livraisonLoad();
+      setTimeout(autoBackupDaily, 5000); // backup after data is loaded
       if(!_isWorker) setTimeout(()=>refreshTeamList().catch(()=>{}),1500);
       _fbLoadApiKey();
       initAiChat();
