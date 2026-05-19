@@ -1874,10 +1874,15 @@ async function doLogin(){
   }
   // ── NORMAL LOGIN ────────────────────────────────────────────────────
   btn.disabled=true;btn.textContent='Connexion…';err.textContent='';
-  try{ await window._fbSignIn(email,pw); }
+  try{
+    await Promise.race([
+      window._fbSignIn(email,pw),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),12000))
+    ]);
+  }
   catch(e){
-    const m={'auth/invalid-credential':'E-mail ou mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet e-mail.','auth/wrong-password':'Mot de passe incorrect.','auth/too-many-requests':'Trop de tentatives. Réessayez plus tard.'};
-    err.textContent=m[e.code]||'Erreur : '+e.message;
+    const m={'auth/invalid-credential':'E-mail ou mot de passe incorrect.','auth/user-not-found':'Aucun compte avec cet e-mail.','auth/wrong-password':'Mot de passe incorrect.','auth/too-many-requests':'Trop de tentatives. Réessayez plus tard.','Error: timeout':'Connexion lente — vérifiez votre réseau et réessayez.'};
+    err.textContent=m[e.code]||m[e.message]||(e.message==='timeout'?'Connexion lente — vérifiez votre réseau et réessayez.':'Erreur : '+e.message);
     btn.disabled=false;btn.textContent='Se connecter';
   }
 }
