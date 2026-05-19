@@ -2020,7 +2020,7 @@ async function autoBackupDaily(){
 async function openBackupsModal(){
   const list=document.getElementById('backupsList');
   list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:8px 0">Chargement…</div>';
-  document.getElementById('backupsModal').style.display='flex';
+  openModal('backupsModal');
   try{
     const backups=await Promise.race([window._fbGet(_backupFbPath()),new Promise(r=>setTimeout(()=>r(null),8000))]);
     if(!backups||Object.keys(backups).length===0){
