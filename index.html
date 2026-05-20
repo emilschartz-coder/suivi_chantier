@@ -2016,10 +2016,10 @@ function _stripPlanData(chantiers){
 
 function saveNow(){ pushToFirebase(); showToast('💾 Sauvegardé'); autoBackupDaily(); }
 function pushToFirebase(){
-  if(!window._fbSet||!_uid){setSyncStatus('offline');return;}
+  if(!window._fbSet||!_uid){setSyncStatus('offline');return Promise.reject('offline');}
   setSyncStatus('syncing');
   const payload={chantiers:_stripPlanData(state.chantiers),sousTraitants:state.sousTraitants,profile:state.profile,plannings:state.plannings||[],documents:(state.documents||[]).map(function(d){var{photos,...rest}=d;return rest;}),updatedAt:Date.now()};
-  window._fbSet(getFbPath(),payload).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('offline'));
+  return window._fbSet(getFbPath(),payload).then(()=>setSyncStatus('synced')).catch(e=>{setSyncStatus('offline');throw e;});
 }
 function autoSave(){ if(!_isSyncing) pushToFirebase(); }
 
@@ -8063,13 +8063,14 @@ function uploadSTDocs(stId,input){
       const entry={name:file.name,data:dataUrl,ts};
       st.docs.push(entry);
       _refreshSTDocsUI(st);
-      autoSave();
-      // 2. En arrière-plan: uploader sur Firebase Storage et remplacer base64 par URL
+      // 2. Sauvegarder et confirmer
+      pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde'));
+      // 3. En arrière-plan: uploader sur Firebase Storage et remplacer base64 par URL
       if(window._stUpload&&window._stUrl&&_uid){
         const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+ts+'_'+file.name;
         window._stUpload(path,dataUrl,file.type||'application/octet-stream')
           .then(()=>window._stUrl(path))
-          .then(url=>{ entry.url=url; delete entry.data; autoSave(); })
+          .then(url=>{ entry.url=url; delete entry.data; pushToFirebase().catch(()=>{}); })
           .catch(()=>{});
       }
     };
