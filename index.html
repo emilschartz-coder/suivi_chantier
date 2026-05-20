@@ -1482,6 +1482,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   </div>
 </div>
 
+<!-- Modal: Documents sous-traitant -->
+<div class="modal-overlay" id="stDocsModal" style="z-index:750">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto">
+    <h3>📄 Documents — <span id="stDocsTitle"></span></h3>
+    <div id="stDocsContainer" style="min-height:60px"></div>
+    <div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">
+      <label class="btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:.4rem;">
+        <input type="file" multiple accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display:none" onchange="uploadSTDocs(document.getElementById('stDocsStId').value,this)">
+        &#128196; Ajouter document(s)
+      </label>
+      <input type="hidden" id="stDocsStId">
+    </div>
+    <div class="modal-btns" style="margin-top:.75rem">
+      <button class="btn-cancel" onclick="closeModal('stDocsModal');openSTManage()">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Assigner sous-traitant à une étape -->
 <div class="modal-overlay" id="stPickerModal">
   <div class="modal">
@@ -4827,6 +4845,7 @@ function renderSTList(){
       </div>
       <div class="st-card-btns">
         <button class="icon-btn" onclick="openSTAccountModal(${st.id})" title="${hasAccount?'Gérer le compte':'Créer un accès app'}" style="background:${hasAccount?'#e8f8ee':'#fff8e1'};color:${hasAccount?'#27ae60':'#b07d00'}">🔑</button>
+        <button class="icon-btn" onclick="openSTDocs(${st.id})" title="Documents" style="background:#eef2ff;color:#4f46e5">${(st.docs||[]).length>0?'📄 '+(st.docs||[]).length:'📄'}</button>
         <button class="icon-btn rename" onclick="openSTEdit(${st.id})" title="Modifier">✏</button>
         <button class="icon-btn del" onclick="deleteSTConfirm(${st.id})" title="Supprimer">×</button>
       </div>
@@ -4908,7 +4927,8 @@ function saveSTEdit(){
     specialty:document.getElementById('stEditSpecialty').value.trim(),
     phone:document.getElementById('stEditPhone').value.trim(),
     email:document.getElementById('stEditEmail').value.trim(),
-    uid:existing?.uid||null  // preserve existing account UID
+    uid:existing?.uid||null,  // preserve existing account UID
+    docs:existing?.docs||[]   // preserve documents
   };
   if(id){const idx=state.sousTraitants.findIndex(s=>s.id===id);if(idx>=0)state.sousTraitants[idx]=obj;}
   else state.sousTraitants.push(obj);
@@ -5457,7 +5477,7 @@ function render(){
 }
 
 // Modal close handlers
-['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal','kundeModal','livraisonModal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
+['addChantierModal','addPhaseModal','addAptModal','bulkRenameAptModal','renameModal','editStepModal','profileModal','stManageModal','stEditModal','stPickerModal','teamModal','workerModal','kundeModal','livraisonModal','stDocsModal'].forEach(id=>{ const el=document.getElementById(id); if(el) el.addEventListener('click',function(e){if(e.target===this)closeModal(id);}); });
 document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 
 // Escape key: close all overlays — safety net if anything gets stuck
@@ -7985,6 +8005,81 @@ function deleteKundeDoc(kid,idx){
   const docs=[...(k.docs||[])]; docs.splice(idx,1);
   const upd={...k}; upd.docs=docs; delete upd.id;
   window._fbSet(_kundenFbPath()+'/'+kid, upd).then(()=>_kundenLoad());
+}
+
+// ── Documents Sous-Traitants ─────────────────────────
+function openSTDocs(stId){
+  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
+  closeModal('stManageModal');
+  document.getElementById('stDocsTitle').textContent=st.name;
+  document.getElementById('stDocsStId').value=stId;
+  _refreshSTDocsUI(st);
+  document.getElementById('stDocsModal').classList.add('open');
+}
+function _refreshSTDocsUI(st){
+  document.getElementById('stDocsContainer').innerHTML=_renderSTDocs(st);
+}
+function _renderSTDocs(st){
+  const docs=st.docs||[];
+  if(!docs.length) return `<p style="font-size:13px;color:var(--ink3)">Aucun document.</p>`;
+  return docs.map((d,i)=>`<div class="doc-row" style="display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--paper2);">
+    <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(d.name||'')}</span>
+    <button class="btn-icon" title="Ouvrir" onclick="openSTDoc(${st.id},${i})">&#128065;</button>
+    <button class="btn-icon" title="Télécharger" onclick="downloadSTDoc(${st.id},${i})">&#11015;</button>
+    <button class="btn-icon" title="Supprimer" onclick="deleteSTDoc(${st.id},${i})" style="color:var(--red)">&#128465;</button>
+  </div>`).join('');
+}
+function openSTDoc(stId,idx){
+  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
+  const d=(st.docs||[])[idx]; if(!d)return;
+  if(d.url) window.open(d.url,'_blank');
+  else if(d.data){ const a=document.createElement('a'); a.href=d.data; a.target='_blank'; a.click(); }
+}
+function downloadSTDoc(stId,idx){
+  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
+  const d=(st.docs||[])[idx]; if(!d)return;
+  const a=document.createElement('a');
+  a.href=d.url||d.data||''; a.download=d.name||'document'; a.click();
+}
+function uploadSTDocs(stId,input){
+  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
+  const files=Array.from(input.files||[]); if(!files.length)return;
+  const docs=[...(st.docs||[])];
+  let done=0;
+  const _finish=()=>{
+    done++;
+    if(done===files.length){
+      st.docs=docs;
+      _refreshSTDocsUI(st);
+      autoSave();
+    }
+  };
+  files.forEach(file=>{
+    const up=window._stUpload;
+    if(up){
+      up('soustraitants/'+stId+'/'+Date.now()+'_'+file.name, file).then(url=>{
+        docs.push({name:file.name,url,ts:Date.now()});
+        _finish();
+      }).catch(()=>{
+        const reader=new FileReader();
+        reader.onload=e=>{ docs.push({name:file.name,data:e.target.result,ts:Date.now()}); _finish(); };
+        reader.readAsDataURL(file);
+      });
+    } else {
+      const reader=new FileReader();
+      reader.onload=e=>{ docs.push({name:file.name,data:e.target.result,ts:Date.now()}); _finish(); };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+function deleteSTDoc(stId,idx){
+  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
+  if(!confirm('Supprimer ce document ?'))return;
+  const docs=[...(st.docs||[])]; docs.splice(idx,1);
+  st.docs=docs;
+  _refreshSTDocsUI(st);
+  autoSave();
+  showToast('🗑 Document supprimé');
 }
 
 function _kundenLinkedProjects(kid){
