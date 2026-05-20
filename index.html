@@ -7974,35 +7974,26 @@ function downloadKundeDoc(kid,idx){
 function uploadKundeDocs(kid,input){
   const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
   const files=Array.from(input.files||[]); if(!files.length)return;
-  showToast('⏳ Upload '+files.length+' fichier'+(files.length>1?'s':'')+'…');
-  let remaining=files.length;
-  const docs=[...(k.docs||[])];
-  const _done=()=>{
-    remaining--;
-    if(remaining===0){
-      const upd={...k}; upd.docs=docs; delete upd.id;
-      window._fbSet(_kundenFbPath()+'/'+kid,upd).then(()=>_kundenLoad());
-      showToast('✓ Documents sauvegardés');
-    }
-  };
+  if(!k.docs) k.docs=[];
+  const _saveKunde=()=>{ const upd={...k}; delete upd.id; window._fbSet(_kundenFbPath()+'/'+kid,upd).catch(()=>{}); };
   files.forEach(file=>{
     const r=new FileReader();
     r.onload=ev=>{
       const dataUrl=ev.target.result;
-      const mime=file.type||'application/octet-stream';
       const ts=Date.now();
+      const entry={name:file.name,data:dataUrl,ts};
+      k.docs.push(entry);
+      document.getElementById('kundeDocsContainer')&&(document.getElementById('kundeDocsContainer').innerHTML=_renderKundeDocs(k));
+      _saveKunde();
       if(window._stUpload&&window._stUrl&&_uid){
         const path='docs/'+(_adminUid||_uid)+'/kunden/'+kid+'/'+ts+'_'+file.name;
-        window._stUpload(path,dataUrl,mime)
+        window._stUpload(path,dataUrl,file.type||'application/octet-stream')
           .then(()=>window._stUrl(path))
-          .then(url=>{ docs.push({name:file.name,url,ts}); _done(); })
-          .catch(()=>{ docs.push({name:file.name,data:dataUrl,ts}); _done(); });
-      } else {
-        docs.push({name:file.name,data:dataUrl,ts});
-        _done();
+          .then(url=>{ entry.url=url; delete entry.data; _saveKunde(); })
+          .catch(()=>{});
       }
     };
-    r.onerror=()=>{ showToast('❌ '+file.name); remaining--; };
+    r.onerror=()=>showToast('❌ '+file.name);
     r.readAsDataURL(file);
   });
 }
@@ -8062,37 +8053,27 @@ function uploadSTDocs(stId,input){
   if(!st) return;
   const files=Array.from(input.files||[]);
   if(!files.length) return;
-  showToast('⏳ Upload '+files.length+' fichier'+(files.length>1?'s':'')+'…');
-  let remaining=files.length;
-  const _done=()=>{ remaining--; if(remaining===0){ autoSave(); showToast('✓ Documents sauvegardés'); } };
+  if(!st.docs) st.docs=[];
   files.forEach(file=>{
     const r=new FileReader();
     r.onload=ev=>{
       const dataUrl=ev.target.result;
-      const mime=file.type||'application/octet-stream';
       const ts=Date.now();
-      if(!st.docs) st.docs=[];
+      // 1. Ajouter IMMÉDIATEMENT avec base64 → visible tout de suite
+      const entry={name:file.name,data:dataUrl,ts};
+      st.docs.push(entry);
+      _refreshSTDocsUI(st);
+      autoSave();
+      // 2. En arrière-plan: uploader sur Firebase Storage et remplacer base64 par URL
       if(window._stUpload&&window._stUrl&&_uid){
         const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+ts+'_'+file.name;
-        window._stUpload(path,dataUrl,mime)
+        window._stUpload(path,dataUrl,file.type||'application/octet-stream')
           .then(()=>window._stUrl(path))
-          .then(url=>{
-            st.docs.push({name:file.name,url,ts});
-            _refreshSTDocsUI(st);
-            _done();
-          })
-          .catch(()=>{
-            st.docs.push({name:file.name,data:dataUrl,ts});
-            _refreshSTDocsUI(st);
-            _done();
-          });
-      } else {
-        st.docs.push({name:file.name,data:dataUrl,ts});
-        _refreshSTDocsUI(st);
-        _done();
+          .then(url=>{ entry.url=url; delete entry.data; autoSave(); })
+          .catch(()=>{});
       }
     };
-    r.onerror=()=>{ showToast('❌ '+file.name); remaining--; };
+    r.onerror=()=>showToast('❌ '+file.name);
     r.readAsDataURL(file);
   });
 }
