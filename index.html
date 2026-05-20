@@ -7957,15 +7957,17 @@ function _renderKundeDocs(k){
 function openKundeDoc(kid,idx){
   const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
   const d=(k.docs||[])[idx]; if(!d)return;
-  if(d.url) window.open(d.url,'_blank');
-  else if(d.data){ const a=document.createElement('a'); a.href=d.data; a.target='_blank'; a.click(); }
+  if(d.url){ window.open(d.url,'_blank'); return; }
+  if(d.data){ const url=URL.createObjectURL(_dataUrlToBlob(d.data)); window.open(url,'_blank'); }
 }
 
 function downloadKundeDoc(kid,idx){
   const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
   const d=(k.docs||[])[idx]; if(!d)return;
   const a=document.createElement('a');
-  a.href=d.url||d.data||''; a.download=d.name||'document'; a.click();
+  if(d.url){ a.href=d.url; }
+  else if(d.data){ a.href=URL.createObjectURL(_dataUrlToBlob(d.data)); }
+  a.download=d.name||'document'; a.click();
 }
 
 function uploadKundeDocs(kid,input){
@@ -8024,17 +8026,25 @@ function _renderSTDocs(st){
     <button class="btn-icon" title="Supprimer" onclick="deleteSTDoc(${st.id},${i})" style="color:var(--red)">&#128465;</button>
   </div>`).join('');
 }
+function _dataUrlToBlob(dataUrl){
+  const arr=dataUrl.split(','); const mime=arr[0].match(/:(.*?);/)[1];
+  const bstr=atob(arr[1]); let n=bstr.length; const u8=new Uint8Array(n);
+  while(n--) u8[n]=bstr.charCodeAt(n);
+  return new Blob([u8],{type:mime});
+}
 function openSTDoc(stId,idx){
   const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
   const d=(st.docs||[])[idx]; if(!d)return;
-  if(d.url) window.open(d.url,'_blank');
-  else if(d.data){ const a=document.createElement('a'); a.href=d.data; a.target='_blank'; a.click(); }
+  if(d.url){ window.open(d.url,'_blank'); return; }
+  if(d.data){ const url=URL.createObjectURL(_dataUrlToBlob(d.data)); window.open(url,'_blank'); }
 }
 function downloadSTDoc(stId,idx){
   const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
   const d=(st.docs||[])[idx]; if(!d)return;
   const a=document.createElement('a');
-  a.href=d.url||d.data||''; a.download=d.name||'document'; a.click();
+  if(d.url){ a.href=d.url; }
+  else if(d.data){ a.href=URL.createObjectURL(_dataUrlToBlob(d.data)); }
+  a.download=d.name||'document'; a.click();
 }
 function uploadSTDocs(stId,input){
   const st=state.sousTraitants.find(s=>s.id==stId);
