@@ -8076,51 +8076,50 @@ function uploadSTDocs(stId,input){
   const files=Array.from(input.files||[]);
   if(!files.length) return;
   if(!st.docs) st.docs=[];
-
-  // Résultats accumulés localement — indépendant des remplacements du listener Firebase
-  const results=[]; // {ts, name, url} pour chaque upload réussi
-  let pending=files.length;
-
-  // Afficher spinners immédiatement
-  const spinners=files.map(file=>{
+  // Spinners immédiats
+  const items=files.map(file=>{
     const ts=Date.now()+Math.random();
     st.docs.push({name:file.name,uploading:true,ts});
     return {file,ts};
   });
   _refreshSTDocsUI(st);
-
-  function _done(ts,name,url){
-    if(url) results.push({ts,name,url});
-    pending--;
-    if(pending>0) return;
-    // Tous terminés — fusionner dans l'état actuel et sauvegarder UNE fois
-    const cur=state.sousTraitants.find(s=>s.id==stId);
-    if(cur){
-      // Enlever tous les spinners
-      cur.docs=(cur.docs||[]).filter(d=>!d.uploading);
-      // Ajouter les résultats (éviter doublons par ts)
-      results.forEach(r=>{ if(!cur.docs.find(d=>d.ts===r.ts)) cur.docs.push(r); });
-      _refreshSTDocsUI(cur);
-    }
-    if(results.length===0){ showToast('⚠ Aucun document uploadé'); return; }
-    pushToFirebase()
-      .then(()=>showToast('✓ '+results.length+' document'+(results.length>1?'s':'')+' sauvegardé'+(results.length>1?'s':'')))
-      .catch(()=>showToast('⚠ Erreur sauvegarde Firebase'));
-  }
-
-  spinners.forEach(({file,ts})=>{
-    if(!_uid||!window._stUploadResumable){ _done(ts,file.name,null); return; }
-    const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(ts)+'_'+file.name;
-    window._stUploadResumable(path,file)
-      .then(url=>_done(ts,file.name,url))
-      .catch(err=>{
-        // Enlever spinner de l'UI
+  // Upload séquentiel avec await — identique aux photos
+  (async()=>{
+    const uploaded=[];
+    for(const {file,ts} of items){
+      try{
+        const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.onerror=rej; r.readAsDataURL(file); });
+        const mime=file.type||'application/octet-stream';
+        const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(ts)+'_'+file.name;
+        await window._stUpload(path,dataUrl,mime);
+        const url=await window._stUrl(path);
+        uploaded.push({name:file.name,url,ts});
+        // Mettre à jour spinner → icône
+        const cur=state.sousTraitants.find(s=>s.id==stId);
+        if(cur){
+          const e=(cur.docs||[]).find(d=>d.ts===ts);
+          if(e){delete e.uploading;e.url=url;}
+          _refreshSTDocsUI(cur);
+        }
+      }catch(err){
+        console.error('Upload doc failed:',err);
         const cur=state.sousTraitants.find(s=>s.id==stId);
         if(cur){ cur.docs=(cur.docs||[]).filter(d=>d.ts!==ts); _refreshSTDocsUI(cur); }
-        showToast('❌ '+file.name+': '+(err&&err.code?err.code:'erreur'));
-        _done(ts,file.name,null);
-      });
-  });
+        showToast('❌ '+file.name+' non uploadé');
+      }
+    }
+    if(!uploaded.length) return;
+    // Fusionner dans état actuel puis sauvegarder UNE fois
+    const cur=state.sousTraitants.find(s=>s.id==stId);
+    if(cur){
+      cur.docs=(cur.docs||[]).filter(d=>!d.uploading);
+      uploaded.forEach(u=>{ if(!cur.docs.find(d=>d.ts===u.ts)) cur.docs.push(u); });
+      _refreshSTDocsUI(cur);
+    }
+    pushToFirebase()
+      .then(()=>showToast('✓ '+uploaded.length+' document'+(uploaded.length>1?'s':'')+' sauvegardé'+(uploaded.length>1?'s':'')))
+      .catch(()=>showToast('⚠ Erreur sauvegarde'));
+  })();
 }
 function deleteSTDoc(stId,idx){
   const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
