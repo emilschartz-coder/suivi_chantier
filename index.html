@@ -1031,6 +1031,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
     <span class="user-badge" id="userBadge"></span>
     <div id="adminHeaderBtns" style="display:contents">
       <button class="header-btn" onclick="openProfileModal()" title="Profil entreprise">🏢 Profil</button>
+      <button class="header-btn" onclick="openActivityLog()" title="Journal d'activité">📋 Journal</button>
       <button class="header-btn" onclick="openBackupsModal()" title="Sauvegardes automatiques" style="border-color:rgba(26,107,58,.4);color:#6abf80">🗄 Backups</button>
       <button class="header-btn" id="installBtn" onclick="installApp()" style="display:none">📲 Installer</button>
       <button class="header-btn" onclick="openRapportModal()" style="background:rgba(122,182,72,.18);border-color:rgba(122,182,72,.4);color:#a8d878">📝 Rapport</button>
@@ -1531,6 +1532,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   </div>
 </div>
 
+<!-- Modal: Journal d'activité -->
+<div class="modal-overlay" id="activityLogModal">
+  <div class="modal wide">
+    <h3>📋 Journal d'activité</h3>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:12px;">Les 100 dernières actions de l'équipe.</p>
+    <div id="activityLogList" style="max-height:420px;overflow-y:auto;"></div>
+    <div class="modal-footer">
+      <div></div>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('activityLogModal')">Fermer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Sauvegardes -->
 <div class="modal-overlay" id="backupsModal">
   <div class="modal wide">
@@ -1987,6 +2003,78 @@ function pushToFirebase(){
   window._fbSet(getFbPath(),payload).then(()=>setSyncStatus('synced')).catch(()=>setSyncStatus('offline'));
 }
 function autoSave(){ if(!_isSyncing) pushToFirebase(); }
+
+// ════════════════════════════════════════
+//  ACTIVITY LOG
+// ════════════════════════════════════════
+function _logFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/activityLog'; }
+
+function logActivity(action, details){
+  if(!window._fbSet||!_uid) return;
+  const entry={
+    ts: Date.now(),
+    action,
+    user: _isWorker?(_workerName||'Worker'):(state.profile?.companyName||'Admin'),
+    isWorker: !!_isWorker,
+    ...details
+  };
+  const key='log_'+entry.ts+'_'+Math.random().toString(36).slice(2,6);
+  window._fbSet(_logFbPath()+'/'+key, entry).catch(()=>{});
+  // Keep log lean: trim old entries client-side occasionally
+  if(Math.random()<0.05) _trimActivityLog();
+}
+
+async function _trimActivityLog(){
+  try{
+    const logs=await Promise.race([window._fbGet(_logFbPath()),new Promise(r=>setTimeout(()=>r(null),5000))]);
+    if(!logs) return;
+    const keys=Object.keys(logs).sort();
+    if(keys.length>200){
+      for(const k of keys.slice(0,keys.length-150)) window._fbSet(_logFbPath()+'/'+k,null).catch(()=>{});
+    }
+  }catch(e){}
+}
+
+async function openActivityLog(){
+  openModal('activityLogModal');
+  const list=document.getElementById('activityLogList');
+  list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:12px 0">Chargement…</div>';
+  try{
+    const logs=await Promise.race([window._fbGet(_logFbPath()),new Promise(r=>setTimeout(()=>r(null),8000))]);
+    if(!logs||Object.keys(logs).length===0){
+      list.innerHTML='<div style="color:var(--ink3);font-size:13px;padding:12px 0">Aucune activité enregistrée.</div>';
+      return;
+    }
+    const entries=Object.values(logs).sort((a,b)=>b.ts-a.ts).slice(0,100);
+    const icons={completed:'✅',reopened:'↩',started:'▶',chantier_added:'🏗',chantier_deleted:'🗑',phase_deleted:'🗑',step_deleted:'🗑',step_added:'➕',blocked:'🔴'};
+    list.innerHTML=entries.map(e=>{
+      const d=new Date(e.ts);
+      const dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const icon=icons[e.action]||'📝';
+      const who=`<span style="font-weight:600;color:${e.isWorker?'var(--accent)':'var(--ink2)'}">${escHtml(e.user)}</span>`;
+      let what='';
+      if(e.action==='completed') what=`a terminé <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='started') what=`a démarré <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='reopened') what=`a réouvert <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='chantier_added') what=`a créé le chantier <b>${escHtml(e.chantier||'')}</b>`;
+      else if(e.action==='chantier_deleted') what=`a supprimé le chantier <b>${escHtml(e.chantier||'')}</b>`;
+      else if(e.action==='phase_deleted') what=`a supprimé la phase <b>${escHtml(e.phase||'')}</b>`;
+      else if(e.action==='step_added') what=`a ajouté l'étape <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='step_deleted') what=`a supprimé l'étape <b>${escHtml(e.step||'')}</b>`;
+      else what=e.action;
+      const where=e.chantier&&e.action!=='chantier_added'&&e.action!=='chantier_deleted'?`<span style="color:var(--ink3)"> · ${escHtml(e.chantier)}${e.phase?' › '+escHtml(e.phase):''}</span>`:'';
+      return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--paper3);">
+        <div style="font-size:18px;flex-shrink:0;margin-top:1px;">${icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:13px;">${who} ${what}${where}</div>
+          <div style="font-size:11px;color:var(--ink3);margin-top:2px;">${dateStr}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    list.innerHTML='<div style="color:var(--red);font-size:13px;">Erreur de chargement.</div>';
+  }
+}
 
 // ════════════════════════════════════════
 //  BACKUP SYSTEM
@@ -2525,9 +2613,9 @@ function updateNote(cid,pid,si,v){ const ph=getPhase(cid,pid); ph.steps[si].note
 function updateProjectNotes(cid,pid,v){ const ph=getPhase(cid,pid); ph.notes=v; clearTimeout(_noteDebounce); _noteDebounce=setTimeout(()=>autoSave(),1500); }
 function toggleProjectNotes(){ _projectNotesOpen=!_projectNotesOpen; const c=document.getElementById('projectNotesCard'); if(c)c.classList.toggle('open',_projectNotesOpen); }
 
-function markInProgress(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; s.inprogress=true;s.done=false;s.open=true; if(!s.startedAt)s.startedAt=new Date().toISOString(); autoSave();render();showToast('▶ Étape démarrée'); }
-function markDone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; s.done=true;s.inprogress=false;s.checked=s.checked.map(()=>true);s.open=false;s.doneAt=new Date().toISOString(); if(!s.startedAt)s.startedAt=s.doneAt; autoSave();render();showToast('✓ Étape terminée'); }
-function markUndone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; s.done=false;s.inprogress=false;s.checked=s.checked.map(()=>false);s.open=true;s.doneAt=null;s.startedAt=null; autoSave();render();showToast('↩ Étape réouverte'); }
+function markInProgress(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; const c=getChantier(cid); s.inprogress=true;s.done=false;s.open=true; if(!s.startedAt)s.startedAt=new Date().toISOString(); autoSave();render();showToast('▶ Étape démarrée'); logActivity('started',{step:s.name,phase:ph.name,chantier:c?.name}); }
+function markDone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; const c=getChantier(cid); s.done=true;s.inprogress=false;s.checked=s.checked.map(()=>true);s.open=false;s.doneAt=new Date().toISOString(); if(!s.startedAt)s.startedAt=s.doneAt; autoSave();render();showToast('✓ Étape terminée'); logActivity('completed',{step:s.name,phase:ph.name,chantier:c?.name}); }
+function markUndone(cid,pid,si){ const ph=getPhase(cid,pid); const s=ph.steps[si]; const c=getChantier(cid); s.done=false;s.inprogress=false;s.checked=s.checked.map(()=>false);s.open=true;s.doneAt=null;s.startedAt=null; autoSave();render();showToast('↩ Étape réouverte'); logActivity('reopened',{step:s.name,phase:ph.name,chantier:c?.name}); }
 
 // Chantier CRUD
 function openAddChantierModal(){
@@ -2573,10 +2661,11 @@ function addChantier(){
   state.currentPhaseId=phases[0].id;
   render();
   showToast('🏗 Chantier créé');
+  logActivity('chantier_added',{chantier:name});
 }
 function openRenameModal(cid){ const c=getChantier(cid); document.getElementById('renameChantierId').value=cid; document.getElementById('renameChantierName').value=c.name; document.getElementById('renameChantierLocation').value=c.location||''; document.getElementById('renameModal').classList.add('open'); setTimeout(()=>{const el=document.getElementById('renameChantierName');el.select();},100); }
 function confirmRename(){ const cid=+document.getElementById('renameChantierId').value; const name=document.getElementById('renameChantierName').value.trim(); const loc=document.getElementById('renameChantierLocation').value.trim(); if(!name)return; const c=getChantier(cid); c.name=name; const oldLoc=c.location||''; c.location=loc; if(loc!==oldLoc) delete _weatherCache[cid]; closeModal('renameModal');autoSave();render();showToast('✏ Enregistré'); }
-function deleteChantier(cid){ if(!confirm('Supprimer ce chantier et toutes ses phases ?'))return; state.chantiers=state.chantiers.filter(c=>c.id!==cid); if(state.currentChantierId===cid){state.currentView='dashboard';state.currentChantierId=null;state.currentPhaseId=null;} autoSave();render();showToast('🗑 Supprimé'); }
+function deleteChantier(cid){ if(!confirm('Supprimer ce chantier et toutes ses phases ?'))return; const c=getChantier(cid); const name=c?.name||''; state.chantiers=state.chantiers.filter(ch=>ch.id!==cid); if(state.currentChantierId===cid){state.currentView='dashboard';state.currentChantierId=null;state.currentPhaseId=null;} autoSave();render();showToast('🗑 Supprimé'); logActivity('chantier_deleted',{chantier:name}); }
 
 // Phase CRUD
 function openAddPhaseModal(cid){ document.getElementById('addPhaseChantierId').value=cid; document.getElementById('addPhaseType').value='go'; toggleCustomPhaseUI('go'); document.getElementById('addPhaseModal').classList.add('open'); }
@@ -3260,7 +3349,7 @@ function removeAptPlan(aptId,cid,pid,idx){
   autoSave();renderChecklist(cid,pid);showToast('🗑 Plan supprimé');
 }
 
-function deletePhase(cid,pid){ if(!confirm('Supprimer cette phase ?'))return; const c=getChantier(cid); c.phases=c.phases.filter(p=>p.id!==pid); if(state.currentPhaseId===pid){state.currentView='dashboard';state.currentChantierId=null;state.currentPhaseId=null;} autoSave();render();showToast('🗑 Phase supprimée'); }
+function deletePhase(cid,pid){ if(!confirm('Supprimer cette phase ?'))return; const c=getChantier(cid); const ph=getPhase(cid,pid); const pname=ph?.name||''; c.phases=c.phases.filter(p=>p.id!==pid); if(state.currentPhaseId===pid){state.currentView='dashboard';state.currentChantierId=null;state.currentPhaseId=null;} autoSave();render();showToast('🗑 Phase supprimée'); logActivity('phase_deleted',{phase:pname,chantier:c?.name}); }
 
 // Step CRUD
 function openEditStepModal(cid,pid,idx,aptId){
