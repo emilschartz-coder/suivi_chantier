@@ -2061,6 +2061,8 @@ async function openActivityLog(){
       else if(e.action==='phase_deleted') what=`a supprimé la phase <b>${escHtml(e.phase||'')}</b>`;
       else if(e.action==='step_added') what=`a ajouté l'étape <b>${escHtml(e.step||'')}</b>`;
       else if(e.action==='step_deleted') what=`a supprimé l'étape <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='st_added') what=`a ajouté le sous-traitant <b>${escHtml(e.step||'')}</b>`;
+      else if(e.action==='st_updated') what=`a modifié le sous-traitant <b>${escHtml(e.step||'')}</b>`;
       else what=e.action;
       const where=e.chantier&&e.action!=='chantier_added'&&e.action!=='chantier_deleted'?`<span style="color:var(--ink3)"> · ${escHtml(e.chantier)}${e.phase?' › '+escHtml(e.phase):''}</span>`:'';
       return `<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--paper3);">
@@ -4913,6 +4915,7 @@ function saveSTEdit(){
   closeModal('stEditModal');
   autoSave();render();
   showToast(id?'✏ Sous-traitant modifié':'✓ Sous-traitant ajouté');
+  logActivity(id?'st_updated':'st_added',{step:obj.name,chantier:obj.company||''});
   openSTManage();
 }
 function openSTAccountModal(stId){
