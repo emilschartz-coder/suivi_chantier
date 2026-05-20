@@ -8056,41 +8056,21 @@ function downloadSTDoc(stId,idx){
 }
 function uploadSTDocs(stId,input){
   const st=state.sousTraitants.find(s=>s.id==stId);
-  if(!st){showToast('❌ Sous-traitant introuvable');return;}
+  if(!st) return;
   const files=Array.from(input.files||[]);
   if(!files.length) return;
-  showToast('⏳ Upload en cours…');
-  let done=0;
-  const docs=[...(st.docs||[])];
-  const _finish=(err)=>{
-    if(err) showToast('⚠ '+err);
-    done++;
-    if(done===files.length){
-      st.docs=docs;
-      _refreshSTDocsUI(st);
-      autoSave();
-      showToast('✓ '+docs.filter(d=>d.ts>=Date.now()-5000).length+' document(s) sauvegardé(s)');
-    }
-  };
+  let remaining=files.length;
   files.forEach(file=>{
-    if(window._stUploadFile&&_uid){
-      const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Date.now()+'_'+file.name;
-      window._stUploadFile(path,file)
-        .then(()=>window._stUrl(path))
-        .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
-        .catch(()=>{
-          // fallback: base64
-          const r=new FileReader();
-          r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
-          r.onerror=()=>_finish(file.name+' non lisible');
-          r.readAsDataURL(file);
-        });
-    } else {
-      const r=new FileReader();
-      r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
-      r.onerror=()=>_finish(file.name+' non lisible');
-      r.readAsDataURL(file);
-    }
+    const r=new FileReader();
+    r.onload=ev=>{
+      if(!st.docs) st.docs=[];
+      st.docs.push({name:file.name,data:ev.target.result,ts:Date.now()});
+      _refreshSTDocsUI(st);  // affiche immédiatement
+      remaining--;
+      if(remaining===0){ autoSave(); showToast('✓ Documents sauvegardés'); }
+    };
+    r.onerror=()=>{ remaining--; showToast('❌ Erreur: '+file.name); };
+    r.readAsDataURL(file);
   });
 }
 function deleteSTDoc(stId,idx){
