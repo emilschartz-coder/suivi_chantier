@@ -924,12 +924,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, get, onValue, off, goOffline, goOnline } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getStorage, ref as sRef, uploadString, getDownloadURL, deleteObject, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getStorage, ref as sRef, uploadString, uploadBytes, getDownloadURL, deleteObject, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
   const firebaseConfig={apiKey:"AIzaSyD8ake3Ao2tHED9JyfVtrPq5XGlfaAVKP8",authDomain:"chantierpro-wp.firebaseapp.com",databaseURL:"https://chantierpro-wp-default-rtdb.europe-west1.firebasedatabase.app",projectId:"chantierpro-wp",storageBucket:"chantierpro-wp.firebasestorage.app",messagingSenderId:"274406862837",appId:"1:274406862837:web:965215f652e8a42927fabc"};
   const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
   setPersistence(auth, browserLocalPersistence).catch(()=>{});
   const storage=getStorage(app);
   window._stUpload=(path,dataUrl,mime)=>uploadString(sRef(storage,path),dataUrl,'data_url',{contentType:mime});
+  window._stUploadFile=(path,file)=>uploadBytes(sRef(storage,path),file,{contentType:file.type||'application/octet-stream'});
   window._stUrl=(path)=>getDownloadURL(sRef(storage,path));
   window._stGetBytes=(path)=>getBytes(sRef(storage,path)); // returns Uint8Array, no CORS issue
   window._stDelete=(path)=>deleteObject(sRef(storage,path)).catch(()=>{});
@@ -7973,26 +7974,33 @@ function downloadKundeDoc(kid,idx){
 function uploadKundeDocs(kid,input){
   const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
   const files=Array.from(input.files||[]); if(!files.length)return;
+  showToast('⏳ Upload en cours…');
   const docs=[...(k.docs||[])];
   let done=0;
-  const _finish=()=>{ done++; if(done===files.length){ const upd={...k}; upd.docs=docs; delete upd.id; window._fbSet(_kundenFbPath()+'/'+kid,upd).then(()=>_kundenLoad()); showToast('✓ Document'+(done>1?'s':'')+' ajouté'+(done>1?'s':'')); } };
+  const _finish=()=>{
+    done++;
+    if(done===files.length){
+      const upd={...k}; upd.docs=docs; delete upd.id;
+      window._fbSet(_kundenFbPath()+'/'+kid,upd).then(()=>_kundenLoad());
+      showToast('✓ '+done+' document'+(done>1?'s':'')+' sauvegardé'+(done>1?'s':''));
+    }
+  };
   files.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const dataUrl=ev.target.result;
-      const mime=file.type||'application/octet-stream';
-      if(window._stUpload&&_uid){
-        const path='kunden/'+(_adminUid||_uid)+'/'+kid+'/'+Date.now()+'_'+file.name;
-        window._stUpload(path,dataUrl,mime)
-          .then(()=>window._stUrl(path))
-          .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
-          .catch(()=>{ docs.push({name:file.name,data:dataUrl,ts:Date.now()}); _finish(); });
-      } else {
-        docs.push({name:file.name,data:dataUrl,ts:Date.now()});
-        _finish();
-      }
-    };
-    reader.readAsDataURL(file);
+    if(window._stUploadFile&&_uid){
+      const path='docs/'+(_adminUid||_uid)+'/kunden/'+kid+'/'+Date.now()+'_'+file.name;
+      window._stUploadFile(path,file)
+        .then(()=>window._stUrl(path))
+        .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
+        .catch(()=>{
+          const r=new FileReader();
+          r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
+          r.readAsDataURL(file);
+        });
+    } else {
+      const r=new FileReader();
+      r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
+      r.readAsDataURL(file);
+    }
   });
 }
 
@@ -8051,25 +8059,38 @@ function uploadSTDocs(stId,input){
   if(!st){showToast('❌ Sous-traitant introuvable');return;}
   const files=Array.from(input.files||[]);
   if(!files.length) return;
-  showToast('⏳ Chargement des documents…');
+  showToast('⏳ Upload en cours…');
   let done=0;
   const docs=[...(st.docs||[])];
+  const _finish=(err)=>{
+    if(err) showToast('⚠ '+err);
+    done++;
+    if(done===files.length){
+      st.docs=docs;
+      _refreshSTDocsUI(st);
+      autoSave();
+      showToast('✓ '+docs.filter(d=>d.ts>=Date.now()-5000).length+' document(s) sauvegardé(s)');
+    }
+  };
   files.forEach(file=>{
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      try{
-        docs.push({name:file.name,data:ev.target.result,ts:Date.now()});
-      }catch(e){}
-      done++;
-      if(done===files.length){
-        st.docs=docs;
-        _refreshSTDocsUI(st);
-        autoSave();
-        showToast('✓ '+done+' document'+(done>1?'s':'')+' ajouté'+(done>1?'s':''));
-      }
-    };
-    reader.onerror=()=>{ done++; showToast('❌ Erreur: '+file.name); };
-    reader.readAsDataURL(file);
+    if(window._stUploadFile&&_uid){
+      const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Date.now()+'_'+file.name;
+      window._stUploadFile(path,file)
+        .then(()=>window._stUrl(path))
+        .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
+        .catch(()=>{
+          // fallback: base64
+          const r=new FileReader();
+          r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
+          r.onerror=()=>_finish(file.name+' non lisible');
+          r.readAsDataURL(file);
+        });
+    } else {
+      const r=new FileReader();
+      r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
+      r.onerror=()=>_finish(file.name+' non lisible');
+      r.readAsDataURL(file);
+    }
   });
 }
 function deleteSTDoc(stId,idx){
