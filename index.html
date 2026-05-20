@@ -931,6 +931,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   const storage=getStorage(app);
   window._stUpload=(path,dataUrl,mime)=>uploadString(sRef(storage,path),dataUrl,'data_url',{contentType:mime});
   window._stUploadFile=(path,file)=>uploadBytes(sRef(storage,path),file,{contentType:file.type||'application/octet-stream'});
+  window._getAuthToken=()=>auth.currentUser?auth.currentUser.getIdToken():Promise.reject('not-auth');
   window._stUrl=(path)=>getDownloadURL(sRef(storage,path));
   window._stGetBytes=(path)=>getBytes(sRef(storage,path)); // returns Uint8Array, no CORS issue
   window._stDelete=(path)=>deleteObject(sRef(storage,path)).catch(()=>{});
@@ -8028,6 +8029,23 @@ function _renderSTDocs(st){
     <button class="btn-icon" title="Supprimer" onclick="deleteSTDoc(${st.id},${i})" style="color:var(--red)">&#128465;</button>
   </div>`).join('');
 }
+async function _uploadDocToStorage(path, file){
+  // Upload direct via REST API — plus fiable que le SDK pour les grands fichiers
+  const BUCKET='chantierpro-wp.firebasestorage.app';
+  const token=await window._getAuthToken();
+  const encodedPath=encodeURIComponent(path);
+  const url=`https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o?uploadType=media&name=${encodedPath}`;
+  const res=await fetch(url,{
+    method:'POST',
+    headers:{'Authorization':'Bearer '+token,'Content-Type':file.type||'application/octet-stream'},
+    body:file
+  });
+  if(!res.ok) throw new Error('upload '+res.status);
+  const data=await res.json();
+  const token2=data.downloadTokens||data.metadata?.downloadTokens;
+  return `https://firebasestorage.googleapis.com/v0/b/${BUCKET}/o/${encodedPath}?alt=media&token=${token2}`;
+}
+
 function _dataUrlToBlob(dataUrl){
   const arr=dataUrl.split(','); const mime=arr[0].match(/:(.*?);/)[1];
   const bstr=atob(arr[1]); let n=bstr.length; const u8=new Uint8Array(n);
@@ -8087,10 +8105,9 @@ function uploadSTDocs(stId,input){
         }
         _finalize();
       };
-      if(window._stUpload&&window._stUrl&&_uid){
+      if(_uid){
         const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(entry.ts)+'_'+file.name;
-        window._stUpload(path,dataUrl,mime)
-          .then(()=>window._stUrl(path))
+        _uploadDocToStorage(path,file)
           .then(url=>_setResult(url,null))
           .catch(()=>_setResult(null,dataUrl));
       } else { _setResult(null,dataUrl); }
