@@ -924,7 +924,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   import { initializeApp, deleteApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, get, onValue, off, goOffline, goOnline } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getStorage, ref as sRef, uploadString, uploadBytes, getDownloadURL, deleteObject, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { getStorage, ref as sRef, uploadString, uploadBytes, uploadBytesResumable, getDownloadURL, deleteObject, getBytes } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
   const firebaseConfig={apiKey:"AIzaSyD8ake3Ao2tHED9JyfVtrPq5XGlfaAVKP8",authDomain:"chantierpro-wp.firebaseapp.com",databaseURL:"https://chantierpro-wp-default-rtdb.europe-west1.firebasedatabase.app",projectId:"chantierpro-wp",storageBucket:"chantierpro-wp.firebasestorage.app",messagingSenderId:"274406862837",appId:"1:274406862837:web:965215f652e8a42927fabc"};
   const app=initializeApp(firebaseConfig);const db=getDatabase(app);const auth=getAuth(app);
   setPersistence(auth, browserLocalPersistence).catch(()=>{});
@@ -932,6 +932,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
   window._stUpload=(path,dataUrl,mime)=>uploadString(sRef(storage,path),dataUrl,'data_url',{contentType:mime});
   window._stUploadFile=(path,file)=>uploadBytes(sRef(storage,path),file,{contentType:file.type||'application/octet-stream'});
   window._getAuthToken=()=>auth.currentUser?auth.currentUser.getIdToken():Promise.reject('not-auth');
+  window._stUploadResumable=(path,file)=>new Promise((resolve,reject)=>{
+    const task=uploadBytesResumable(sRef(storage,path),file,{contentType:file.type||'application/octet-stream'});
+    task.on('state_changed',null,reject,()=>getDownloadURL(task.snapshot.ref).then(resolve).catch(reject));
+  });
   window._stUrl=(path)=>getDownloadURL(sRef(storage,path));
   window._stGetBytes=(path)=>getBytes(sRef(storage,path)); // returns Uint8Array, no CORS issue
   window._stDelete=(path)=>deleteObject(sRef(storage,path)).catch(()=>{});
@@ -8105,11 +8109,18 @@ function uploadSTDocs(stId,input){
         }
         _finalize();
       };
-      if(_uid){
+      if(_uid&&window._stUploadResumable){
         const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(entry.ts)+'_'+file.name;
-        _uploadDocToStorage(path,file)
+        window._stUploadResumable(path,file)
           .then(url=>_setResult(url,null))
-          .catch(()=>_setResult(null,dataUrl));
+          .catch(err=>{
+            // Supprimer l'entrée — ne pas stocker base64 (trop grand pour RTDB)
+            const s=state.sousTraitants.find(x=>x.id==stId);
+            if(s) s.docs=(s.docs||[]).filter(d=>d.ts!==entry.ts);
+            _refreshSTDocsUI(s||st);
+            pending--;
+            showToast('❌ Upload échoué: '+(err&&err.code||'erreur réseau'));
+          });
       } else { _setResult(null,dataUrl); }
     };
     r.onerror=()=>{ st.docs=st.docs.filter(d=>d.ts!==entry.ts); pending--; showToast('❌ '+file.name); };
