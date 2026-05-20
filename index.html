@@ -8090,7 +8090,7 @@ function uploadSTDocs(stId,input){
       try{
         const dataUrl=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=e=>res(e.target.result); r.onerror=rej; r.readAsDataURL(file); });
         const mime=file.type||'application/octet-stream';
-        const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(ts)+'_'+file.name;
+        const path='docPhotos/'+(_adminUid||_uid)+'/stDocs/'+stId+'/'+Math.floor(ts)+'_'+file.name;
         await window._stUpload(path,dataUrl,mime);
         const url=await window._stUrl(path);
         uploaded.push({name:file.name,url,ts});
