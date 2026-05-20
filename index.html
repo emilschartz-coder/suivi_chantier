@@ -8022,9 +8022,9 @@ function _renderSTDocs(st){
   const docs=st.docs||[];
   if(!docs.length) return `<p style="font-size:13px;color:var(--ink3)">Aucun document.</p>`;
   return docs.map((d,i)=>`<div class="doc-row" style="display:flex;align-items:center;gap:.5rem;padding:.5rem 0;border-bottom:1px solid var(--paper2);">
-    <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(d.name||'')}</span>
-    <button class="btn-icon" title="Ouvrir" onclick="openSTDoc(${st.id},${i})">&#128065;</button>
-    <button class="btn-icon" title="Télécharger" onclick="downloadSTDoc(${st.id},${i})">&#11015;</button>
+    <span style="font-size:13px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_esc(d.name||'')}${d.uploading?'<span style="font-size:11px;color:#999;margin-left:6px">⏳</span>':''}</span>
+    ${d.uploading?'':`<button class="btn-icon" title="Ouvrir" onclick="openSTDoc(${st.id},${i})">&#128065;</button>
+    <button class="btn-icon" title="Télécharger" onclick="downloadSTDoc(${st.id},${i})">&#11015;</button>`}
     <button class="btn-icon" title="Supprimer" onclick="deleteSTDoc(${st.id},${i})" style="color:var(--red)">&#128465;</button>
   </div>`).join('');
 }
@@ -8055,37 +8055,49 @@ function uploadSTDocs(stId,input){
   if(!files.length) return;
   if(!st.docs) st.docs=[];
   files.forEach(file=>{
+    // Afficher immédiatement avec spinner ⏳
+    const ts=Date.now();
+    const entry={name:file.name,uploading:true,ts};
+    st.docs.push(entry);
+    _refreshSTDocsUI(st);
     const r=new FileReader();
     r.onload=ev=>{
       const dataUrl=ev.target.result;
-      const ts=Date.now();
-      // 1. Ajouter IMMÉDIATEMENT avec base64 → visible tout de suite
-      const entry={name:file.name,data:dataUrl,ts};
-      st.docs.push(entry);
-      _refreshSTDocsUI(st);
-      // 2. Sauvegarder et confirmer
-      pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde'));
-      // 3. En arrière-plan: uploader sur Firebase Storage et remplacer base64 par URL
+      const mime=file.type||'application/octet-stream';
       if(window._stUpload&&window._stUrl&&_uid){
         const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+ts+'_'+file.name;
-        window._stUpload(path,dataUrl,file.type||'application/octet-stream')
+        window._stUpload(path,dataUrl,mime)
           .then(()=>window._stUrl(path))
-          .then(url=>{ entry.url=url; delete entry.data; pushToFirebase().catch(()=>{}); })
-          .catch(()=>{});
+          .then(url=>{
+            delete entry.uploading;
+            entry.url=url;
+            _refreshSTDocsUI(st);
+            pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde — réessayez'));
+          })
+          .catch(()=>{
+            // Storage échoue → sauvegarder base64 (fallback)
+            delete entry.uploading;
+            entry.data=dataUrl;
+            _refreshSTDocsUI(st);
+            pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde'));
+          });
+      } else {
+        delete entry.uploading;
+        entry.data=dataUrl;
+        _refreshSTDocsUI(st);
+        pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur'));
       }
     };
-    r.onerror=()=>showToast('❌ '+file.name);
+    r.onerror=()=>{ st.docs=st.docs.filter(d=>d!==entry); _refreshSTDocsUI(st); showToast('❌ '+file.name); };
     r.readAsDataURL(file);
   });
 }
 function deleteSTDoc(stId,idx){
   const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
   if(!confirm('Supprimer ce document ?'))return;
-  const docs=[...(st.docs||[])]; docs.splice(idx,1);
-  st.docs=docs;
+  st.docs.splice(idx,1);
   _refreshSTDocsUI(st);
-  autoSave();
-  showToast('🗑 Document supprimé');
+  pushToFirebase().then(()=>showToast('🗑 Document supprimé')).catch(()=>showToast('⚠ Erreur suppression'));
 }
 
 function _kundenLinkedProjects(kid){
