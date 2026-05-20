@@ -7974,33 +7974,36 @@ function downloadKundeDoc(kid,idx){
 function uploadKundeDocs(kid,input){
   const k=(state.kunden||[]).find(x=>x.id===kid); if(!k)return;
   const files=Array.from(input.files||[]); if(!files.length)return;
-  showToast('⏳ Upload en cours…');
+  showToast('⏳ Upload '+files.length+' fichier'+(files.length>1?'s':'')+'…');
+  let remaining=files.length;
   const docs=[...(k.docs||[])];
-  let done=0;
-  const _finish=()=>{
-    done++;
-    if(done===files.length){
+  const _done=()=>{
+    remaining--;
+    if(remaining===0){
       const upd={...k}; upd.docs=docs; delete upd.id;
       window._fbSet(_kundenFbPath()+'/'+kid,upd).then(()=>_kundenLoad());
-      showToast('✓ '+done+' document'+(done>1?'s':'')+' sauvegardé'+(done>1?'s':''));
+      showToast('✓ Documents sauvegardés');
     }
   };
   files.forEach(file=>{
-    if(window._stUploadFile&&_uid){
-      const path='docs/'+(_adminUid||_uid)+'/kunden/'+kid+'/'+Date.now()+'_'+file.name;
-      window._stUploadFile(path,file)
-        .then(()=>window._stUrl(path))
-        .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
-        .catch(()=>{
-          const r=new FileReader();
-          r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
-          r.readAsDataURL(file);
-        });
-    } else {
-      const r=new FileReader();
-      r.onload=ev=>{ docs.push({name:file.name,data:ev.target.result,ts:Date.now()}); _finish(); };
-      r.readAsDataURL(file);
-    }
+    const r=new FileReader();
+    r.onload=ev=>{
+      const dataUrl=ev.target.result;
+      const mime=file.type||'application/octet-stream';
+      const ts=Date.now();
+      if(window._stUpload&&window._stUrl&&_uid){
+        const path='docs/'+(_adminUid||_uid)+'/kunden/'+kid+'/'+ts+'_'+file.name;
+        window._stUpload(path,dataUrl,mime)
+          .then(()=>window._stUrl(path))
+          .then(url=>{ docs.push({name:file.name,url,ts}); _done(); })
+          .catch(()=>{ docs.push({name:file.name,data:dataUrl,ts}); _done(); });
+      } else {
+        docs.push({name:file.name,data:dataUrl,ts});
+        _done();
+      }
+    };
+    r.onerror=()=>{ showToast('❌ '+file.name); remaining--; };
+    r.readAsDataURL(file);
   });
 }
 
@@ -8059,17 +8062,37 @@ function uploadSTDocs(stId,input){
   if(!st) return;
   const files=Array.from(input.files||[]);
   if(!files.length) return;
+  showToast('⏳ Upload '+files.length+' fichier'+(files.length>1?'s':'')+'…');
   let remaining=files.length;
+  const _done=()=>{ remaining--; if(remaining===0){ autoSave(); showToast('✓ Documents sauvegardés'); } };
   files.forEach(file=>{
     const r=new FileReader();
     r.onload=ev=>{
+      const dataUrl=ev.target.result;
+      const mime=file.type||'application/octet-stream';
+      const ts=Date.now();
       if(!st.docs) st.docs=[];
-      st.docs.push({name:file.name,data:ev.target.result,ts:Date.now()});
-      _refreshSTDocsUI(st);  // affiche immédiatement
-      remaining--;
-      if(remaining===0){ autoSave(); showToast('✓ Documents sauvegardés'); }
+      if(window._stUpload&&window._stUrl&&_uid){
+        const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+ts+'_'+file.name;
+        window._stUpload(path,dataUrl,mime)
+          .then(()=>window._stUrl(path))
+          .then(url=>{
+            st.docs.push({name:file.name,url,ts});
+            _refreshSTDocsUI(st);
+            _done();
+          })
+          .catch(()=>{
+            st.docs.push({name:file.name,data:dataUrl,ts});
+            _refreshSTDocsUI(st);
+            _done();
+          });
+      } else {
+        st.docs.push({name:file.name,data:dataUrl,ts});
+        _refreshSTDocsUI(st);
+        _done();
+      }
     };
-    r.onerror=()=>{ remaining--; showToast('❌ Erreur: '+file.name); };
+    r.onerror=()=>{ showToast('❌ '+file.name); remaining--; };
     r.readAsDataURL(file);
   });
 }
