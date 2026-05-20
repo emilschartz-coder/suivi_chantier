@@ -8054,41 +8054,48 @@ function uploadSTDocs(stId,input){
   const files=Array.from(input.files||[]);
   if(!files.length) return;
   if(!st.docs) st.docs=[];
-  files.forEach(file=>{
-    // Afficher immédiatement avec spinner ⏳
-    const ts=Date.now();
-    const entry={name:file.name,uploading:true,ts};
+  // Afficher tous les fichiers immédiatement avec spinner
+  const entries=files.map(file=>{
+    const entry={name:file.name,uploading:true,ts:Date.now()+Math.random()};
     st.docs.push(entry);
-    _refreshSTDocsUI(st);
+    return {file,entry};
+  });
+  _refreshSTDocsUI(st);
+  let pending=files.length;
+  const _finalize=()=>{
+    pending--;
+    if(pending>0) return;
+    // Tous uploadés → re-chercher dans l'état actuel (listener peut avoir remplacé les objets)
+    const currentSt=state.sousTraitants.find(s=>s.id==stId);
+    if(currentSt) _refreshSTDocsUI(currentSt);
+    pushToFirebase()
+      .then(()=>showToast('✓ '+files.length+' document'+(files.length>1?'s':'')+' sauvegardé'+(files.length>1?'s':'')))
+      .catch(()=>showToast('⚠ Erreur sauvegarde — réessayez'));
+  };
+  entries.forEach(({file,entry})=>{
     const r=new FileReader();
     r.onload=ev=>{
       const dataUrl=ev.target.result;
       const mime=file.type||'application/octet-stream';
+      // Re-trouver l'entry par ts (le listener Firebase peut avoir remplacé les références)
+      const _setResult=(url,data)=>{
+        const s=state.sousTraitants.find(x=>x.id==stId);
+        if(s){
+          let e=(s.docs||[]).find(d=>d.ts===entry.ts);
+          if(!e){if(!s.docs)s.docs=[];e={name:file.name,ts:entry.ts};s.docs.push(e);}
+          delete e.uploading; if(url)e.url=url; else e.data=data;
+        }
+        _finalize();
+      };
       if(window._stUpload&&window._stUrl&&_uid){
-        const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+ts+'_'+file.name;
+        const path='docs/'+(_adminUid||_uid)+'/st/'+stId+'/'+Math.floor(entry.ts)+'_'+file.name;
         window._stUpload(path,dataUrl,mime)
           .then(()=>window._stUrl(path))
-          .then(url=>{
-            delete entry.uploading;
-            entry.url=url;
-            _refreshSTDocsUI(st);
-            pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde — réessayez'));
-          })
-          .catch(()=>{
-            // Storage échoue → sauvegarder base64 (fallback)
-            delete entry.uploading;
-            entry.data=dataUrl;
-            _refreshSTDocsUI(st);
-            pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur sauvegarde'));
-          });
-      } else {
-        delete entry.uploading;
-        entry.data=dataUrl;
-        _refreshSTDocsUI(st);
-        pushToFirebase().then(()=>showToast('✓ '+file.name+' sauvegardé')).catch(()=>showToast('⚠ Erreur'));
-      }
+          .then(url=>_setResult(url,null))
+          .catch(()=>_setResult(null,dataUrl));
+      } else { _setResult(null,dataUrl); }
     };
-    r.onerror=()=>{ st.docs=st.docs.filter(d=>d!==entry); _refreshSTDocsUI(st); showToast('❌ '+file.name); };
+    r.onerror=()=>{ st.docs=st.docs.filter(d=>d.ts!==entry.ts); pending--; showToast('❌ '+file.name); };
     r.readAsDataURL(file);
   });
 }
