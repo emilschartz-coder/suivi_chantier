@@ -8037,27 +8037,28 @@ function downloadSTDoc(stId,idx){
   a.href=d.url||d.data||''; a.download=d.name||'document'; a.click();
 }
 function uploadSTDocs(stId,input){
-  const st=state.sousTraitants.find(s=>s.id==stId); if(!st)return;
-  const files=Array.from(input.files||[]); if(!files.length)return;
-  const docs=[...(st.docs||[])];
+  const st=state.sousTraitants.find(s=>s.id==stId);
+  if(!st){showToast('❌ Sous-traitant introuvable');return;}
+  const files=Array.from(input.files||[]);
+  if(!files.length) return;
+  showToast('⏳ Chargement des documents…');
   let done=0;
-  const _finish=()=>{ done++; if(done===files.length){ st.docs=docs; _refreshSTDocsUI(st); autoSave(); showToast('✓ Document'+(done>1?'s':'')+' ajouté'+(done>1?'s':'')); } };
+  const docs=[...(st.docs||[])];
   files.forEach(file=>{
     const reader=new FileReader();
     reader.onload=ev=>{
-      const dataUrl=ev.target.result;
-      const mime=file.type||'application/octet-stream';
-      if(window._stUpload&&_uid){
-        const path='soustraitants/'+(_adminUid||_uid)+'/'+stId+'/'+Date.now()+'_'+file.name;
-        window._stUpload(path,dataUrl,mime)
-          .then(()=>window._stUrl(path))
-          .then(url=>{ docs.push({name:file.name,url,ts:Date.now()}); _finish(); })
-          .catch(()=>{ docs.push({name:file.name,data:dataUrl,ts:Date.now()}); _finish(); });
-      } else {
-        docs.push({name:file.name,data:dataUrl,ts:Date.now()});
-        _finish();
+      try{
+        docs.push({name:file.name,data:ev.target.result,ts:Date.now()});
+      }catch(e){}
+      done++;
+      if(done===files.length){
+        st.docs=docs;
+        _refreshSTDocsUI(st);
+        autoSave();
+        showToast('✓ '+done+' document'+(done>1?'s':'')+' ajouté'+(done>1?'s':''));
       }
     };
+    reader.onerror=()=>{ done++; showToast('❌ Erreur: '+file.name); };
     reader.readAsDataURL(file);
   });
 }
