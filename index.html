@@ -1979,7 +1979,7 @@ function _stripPlanData(chantiers){
   return chantiers.map(c=>({...c,plans:(c.plans||[]).map(p=>{const{data,...meta}=p;return meta;})}));
 }
 
-function saveNow(){ pushToFirebase(); showToast('💾 Sauvegardé'); }
+function saveNow(){ pushToFirebase(); showToast('💾 Sauvegardé'); autoBackupDaily(); }
 function pushToFirebase(){
   if(!window._fbSet||!_uid){setSyncStatus('offline');return;}
   setSyncStatus('syncing');
@@ -1993,28 +1993,42 @@ function autoSave(){ if(!_isSyncing) pushToFirebase(); }
 // ════════════════════════════════════════
 function _backupFbPath(){ return 'chantierPro/users/'+(_adminUid||_uid)+'/backups'; }
 
+let _backupDoneToday=false;
 async function autoBackupDaily(){
   if(!window._fbGet||!window._fbSet||!_uid||_isWorker) return;
+  if(_backupDoneToday) return; // already succeeded this session
+  if((state.chantiers||[]).length===0) return; // no data to backup yet
   const today=new Date().toISOString().slice(0,10);
-  try{
-    const backups=await Promise.race([window._fbGet(_backupFbPath()),new Promise(r=>setTimeout(()=>r(null),8000))]);
-    const keys=Object.keys(backups||{});
-    if(keys.includes(today)) return; // already backed up today
-    const payload={
-      chantiers:JSON.parse(JSON.stringify(state.chantiers||[])),
-      sousTraitants:JSON.parse(JSON.stringify(state.sousTraitants||[])),
-      profile:{companyName:state.profile?.companyName||''},
-      savedAt:new Date().toISOString(),
-      chantierCount:(state.chantiers||[]).length
-    };
-    await window._fbSet(_backupFbPath()+'/'+today,payload);
-    // Keep only last 10
-    if(keys.length>=10){
-      const sorted=keys.sort();
-      for(const k of sorted.slice(0,keys.length-9)) window._fbSet(_backupFbPath()+'/'+k,null);
+  let attempt=0;
+  while(attempt<3){
+    attempt++;
+    try{
+      const backups=await Promise.race([window._fbGet(_backupFbPath()),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),10000))]);
+      const keys=Object.keys(backups||{});
+      if(keys.includes(today)){_backupDoneToday=true;return;} // already backed up today
+      const payload={
+        chantiers:JSON.parse(JSON.stringify(state.chantiers||[])),
+        sousTraitants:JSON.parse(JSON.stringify(state.sousTraitants||[])),
+        profile:{companyName:state.profile?.companyName||''},
+        savedAt:new Date().toISOString(),
+        chantierCount:(state.chantiers||[]).length
+      };
+      await Promise.race([window._fbSet(_backupFbPath()+'/'+today,payload),new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),10000))]);
+      // Keep only last 10
+      if(keys.length>=10){
+        const sorted=[...keys].sort();
+        for(const k of sorted.slice(0,keys.length-9)) window._fbSet(_backupFbPath()+'/'+k,null).catch(()=>{});
+      }
+      _backupDoneToday=true;
+      console.log('✅ Backup saved for '+today);
+      return;
+    }catch(e){
+      console.warn('Backup attempt '+attempt+' failed:',e.message);
+      if(attempt<3) await new Promise(r=>setTimeout(r,5000)); // wait 5s before retry
     }
-    console.log('✅ Backup saved for '+today);
-  }catch(e){ console.warn('Backup failed:',e.message); }
+  }
+  // All 3 attempts failed — notify admin only (not workers)
+  if(!_isWorker) showToast('⚠ Backup automatique échoué — vérifiez votre connexion');
 }
 
 async function openBackupsModal(){
